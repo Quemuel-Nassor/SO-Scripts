@@ -1,23 +1,22 @@
 #!/bin/bash
 clear
 echo -e "\n\n\n\t\t\tRAID-0 creation script\n\n\n"
-
+echo -e "Before running this script the /dev/sda and /dev/sdb disks must be \nzeroed and the partition type GUID need be Linux RAID\n\n"
 echo -e "These are the online disks in your system:\n"
 fdisk -l
 
-echo -e "\n\nDo you want to create partitions automatically?(Y/N)"
-read rsp
-
-if [[ $rsp = +(N|n) ]];
-then
-    echo -e "\n\nCreating a partition of 70GB on first position of disks /dev/sda and /dev/sdb"
-    if [ sfdisk /dev/sda < disk-conf && sfdisk /dev/sdb < disk-conf ];
+#read rsp
+#
+#if [[ $rsp = +(Y|y) ]];
+#then
+    echo -e "\n\nCreating a RAID-0 using the first partition of disks /dev/sda and /dev/sdb"
+    if [ mdadm --create --verbose --level=0 --metadata=1.2 --raid-devices=2 $/dev/md/RAID-0 $/dev/sda1 $/dev/sdb1 ];
     then
-        echo -e "\n\nPartition successfully created on the following disks\n"
+        echo -e "\n\nRAID-0 successfully created on the following disks\n"
         fdisk /dev/sda p; fdisk /dev/sdb p
     else
-        echo -e "\n\nCould not create partitions\n"
+        echo -e "\n\nCould not create RAID-0\n"
     fi
-fi
+#fi
 echo "Continue..."
 read
