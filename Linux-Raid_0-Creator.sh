@@ -1,26 +1,23 @@
 #!/bin/bash
-
+clear
 echo -e "\n\n\n\t\t\tRAID-0 creation script\n\n\n"
 
 echo -e "These are the online disks in your system:\n"
 fdisk -l
 
-echo -e "Do you want create the partitions manualy?(Y/N)"
+echo -e "\n\nDo you want to create partitions automatically?(Y/N)"
 read rsp
 
-if [[ $rsp = +(Y|y) ]];
+if [[ $rsp = +(N|n) ]];
 then
-    echo -e "Creating a partition of 30GB on first position of /dev/sda\n"
-    if [ fdisk /dev/sda n p 1 2048 +30G ];
+    echo -e "\n\nCreating a partition of 70GB on first position of disks /dev/sda and /dev/sdb"
+    if [ sfdisk /dev/sda < disk-conf && sfdisk /dev/sdb < disk-conf ];
     then
-        echo -e "Partição criada com sucesso\n"
-        fdisk /dev/sda p
-    elif
-    then
-        echo -e "Não foi possível criar a partição "
+        echo -e "\n\nPartition successfully created on the following disks\n"
+        fdisk /dev/sda p; fdisk /dev/sdb p
+    else
+        echo -e "\n\nCould not create partitions\n"
     fi
-else
-    echo -e "\n\nPartitions will be created automatically\n"
 fi
 echo "Continue..."
 read
