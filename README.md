@@ -1,2 +1,2 @@
 # Linux-Scripts
-Repository with linh bash scripts to perform various tasks
+Repository with linux bash scripts to perform various tasks how create a software RAID or install the arch linux
