@@ -53,7 +53,6 @@ raid_creator(){
     echo -e "\n\nInform the second disk for RAID-0:(ex: /dev/sdY)"
     read disk2   
     echo -e "\n\nCreating a RAID-0 using the first partition of disks $disk1 and $disk2"
-    echo $disk1"1"
     mdadm --create --verbose --level=0 --metadata=1.0 --raid-devices=2 /dev/md/RAID-0 $disk1"1" $disk2"1"
 }
 raid_remove(){
