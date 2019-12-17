@@ -64,6 +64,8 @@ raid_conf(){
     mdadm --detail --scan >> /etc/mdadm.conf
     echo -e "\n\nMounting RAID-0"
     mdadm --assemble --scan
+    echo -e "\n\nEnabling for write"
+    mdadm --manage -w /dev/md/RAID-0
 }
 raid_partition(){
     mdadm --detail /dev/md/RAID-0 | grep 'Chunk Size'
