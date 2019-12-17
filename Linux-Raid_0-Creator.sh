@@ -119,21 +119,21 @@ prepare_partition (){
     read chunk
     echo -e "\n\nCreating directory and mounting BOOT"
     mkfs.fat -F32 -v -n BOOT /dev/md/RAID-0p1
-    mkdir -p /mnt/boot/efi && mount /dev/md/RAID-0p1 /mnt/boot/efi
+    mkdir -p /mnt/boot/efi; mount /dev/md/RAID-0p1 /mnt/boot/efi
 
     echo -e "\n\nCreating directory and mounting ROOT"
     (echo y) | mkfs.ext4 -v -L ROOT -m 0.5 -b 4096 -E stride=$((chunk/4096)),stripe-width=$(((chunk/4096)*2)) /dev/md/RAID-0p2
-    mkdir /mnt && mount /dev/md/RAID-0p2 /mnt
+    mkdir /mnt; mount /dev/md/RAID-0p2 /mnt
 
     echo -e "\n\nCreating directory and mounting HOME"
     (echo y) | mkfs.ext4 -v -L HOME -m 0.5 -b 4096 -E stride=$((chunk/4096)),stripe-width=$(((chunk/4096)*2)) /dev/md/RAID-0p3
-    mkdir /mnt/home && mount /dev/md/RAID-0p3 /mnt/home
+    mkdir /mnt/home; mount /dev/md/RAID-0p3 /mnt/home
 
     echo -e "\n\nMounting SWAP"
     mkswap -L SWAP /dev/md/RAID-0p4
     swapon /dev/md/RAID-0p4
 
     echo -e "\n\nSuccessfully created and assembled directories"
-    lsblk
+    lsblk /dev/md/RAID-0
 }
 main
