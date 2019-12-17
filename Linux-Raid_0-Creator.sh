@@ -12,7 +12,7 @@ main(){
     echo -e "6 - Create RAID partitions to install Linux"
     echo -e "7 - Show disks online"
     echo -e "8 - Prepare partitions to install Linux"
-    echo -e "8 - Exit\n"
+    echo -e "9 - Exit\n"
     read option        
     case $option in
         "1")
@@ -65,6 +65,7 @@ raid_remove(){
 }
 raid_conf(){
     echo -e "\n\nWriting RAID-0 config on /etc/mdadm.conf"
+    rm /etc/mdadm.conf
     mdadm --detail --scan >> /etc/mdadm.conf
     echo -e "\n\nMounting RAID-0"
     mdadm --assemble --scan
@@ -121,11 +122,11 @@ prepare_partition (){
     mkdir -p /mnt/boot/efi && mount /dev/md/RAID-0p1 /mnt/boot/efi
 
     echo -e "\n\nCreating directory and mounting ROOT"
-    mkfs.ext4 -v -L ROOT -m 0.5 -b 4096 -E stride=$((chunk/4096)),stripe-width=$(((chunk/4096)*2)) /dev/md/RAID-0p2
+    (echo y) | mkfs.ext4 -v -L ROOT -m 0.5 -b 4096 -E stride=$((chunk/4096)),stripe-width=$(((chunk/4096)*2)) /dev/md/RAID-0p2
     mkdir /mnt && mount /dev/md/RAID-0p2 /mnt
 
     echo -e "\n\nCreating directory and mounting HOME"
-    mkfs.ext4 -v -L HOME -m 0.5 -b 4096 -E stride=$((chunk/4096)),stripe-width=$(((chunk/4096)*2)) /dev/md/RAID-0p3
+    (echo y) | mkfs.ext4 -v -L HOME -m 0.5 -b 4096 -E stride=$((chunk/4096)),stripe-width=$(((chunk/4096)*2)) /dev/md/RAID-0p3
     mkdir /mnt/home && mount /dev/md/RAID-0p3 /mnt/home
 
     echo -e "\n\nMounting SWAP"
