@@ -54,8 +54,6 @@ raid_creator(){
     read disk2   
     echo -e "\n\nCreating a RAID-0 using the first partition of disks $disk1 and $disk2"
     mdadm --create --verbose --level=0 --metadata=1.0 --raid-devices=2 /dev/md/RAID-0 $disk1 $disk2
-    echo -e "\n\nRAID-0 successfully created on /dev/md/RAID-0\n"
-    fdisk /dev/md/RAID-0 -l
 }
 raid_remove(){
     echo -e "\n\nRemoving a RAID-0 from the first partition of disks $disk1 and $disk2"
