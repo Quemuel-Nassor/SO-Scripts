@@ -11,6 +11,7 @@ main(){
     echo -e "5 - Configure RAID-0"
     echo -e "6 - Create RAID partitions to install Linux"
     echo -e "7 - Show disks online"
+    echo -e "8 - Prepare partitions to install Linux"
     echo -e "8 - Exit\n"
     read option        
     case $option in
@@ -38,6 +39,9 @@ main(){
          fdisk -l
          ;;
         "8")
+         prepare_partition
+         ;;
+        "9")
          exit
          ;;
     esac    
@@ -68,32 +72,20 @@ raid_conf(){
     mdadm --manage -w /dev/md/RAID-0
 }
 raid_partition(){
-    mdadm --detail /dev/md/RAID-0 | grep 'Chunk Size'
-    echo -e "\n\nType the value of Chunk Size in bytes:(ex: 512K => 512000)"
-    read chunk
-    
     echo -e "\n\nFormating RAID-0 to GPT"
     (echo g; echo w) | fdisk /dev/md/RAID-0
 
     echo -e "\n\nPreparing BOOT partition on /dev/md/RAID-0p1"
     (echo n; echo 1; echo ; echo +512M; echo t; echo 1; echo w) | fdisk /dev/md/RAID-0
-#    mkfs.fat -F32 -v -n BOOT /dev/md/RAID-0p1
-#    mkdir -p /mnt/boot/efi && mount /dev/md/RAID-0p1 /mnt/boot/efi
 
     echo -e "\n\nPreparing ROOT partition on /dev/md/RAID-0p2"
     (echo n; echo 2; echo ; echo +30G; echo t; echo 2; echo 24; echo w) | fdisk /dev/md/RAID-0
-#    mkfs.ext4 -v -L ROOT -m 0.5 -b 4096 -E stride=$((chunk/4096)),stripe-width=$(((chunk/4096)*2)) /dev/md/RAID-0p2
-#    mkdir /mnt && mount /dev/md/RAID-0p2 /mnt
 
     echo -e "\n\nPreparing HOME partition on /dev/md/RAID-0p3"
     (echo n; echo 3; echo ; echo +30G; echo t; echo 3; echo 28; echo w) | fdisk /dev/md/RAID-0
-#    mkfs.ext4 -v -L HOME -m 0.5 -b 4096 -E stride=$((chunk/4096)),stripe-width=$(((chunk/4096)*2)) /dev/md/RAID-0p3
-#    mkdir /mnt/home && mount /dev/md/RAID-0p3 /mnt/home
 
     echo -e "\n\nPreparing SWAP partition on /dev/md/RAID-0p4"
     (echo n; echo 4; echo ; echo +8G; echo t; echo 4; echo 19; echo w) | fdisk /dev/md/RAID-0
-#    mkswap -L SWAP /dev/md/RAID-0p4
-#    swapon /dev/md/RAID-0p4
 
     echo -e "\n\nSuccessfully created partitions on /dev/md/RAID-0"
     fdisk /dev/md/RAID-0 -l
@@ -121,6 +113,9 @@ disk_remove_partition (){
     (echo d; echo w) | fdisk disk2
 }
 prepare_partition (){
+    mdadm --detail /dev/md/RAID-0 | grep 'Chunk Size'
+    echo -e "\n\nType the value of Chunk Size in bytes:(ex: 512K => 512000)"
+    read chunk
     echo -e "\n\nCreating directory and mounting BOOT"
     mkfs.fat -F32 -v -n BOOT /dev/md/RAID-0p1
     mkdir -p /mnt/boot/efi && mount /dev/md/RAID-0p1 /mnt/boot/efi
