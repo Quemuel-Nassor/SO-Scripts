@@ -71,7 +71,7 @@ raid_partition(){
     read chunk
     
     echo -e "\n\nFormating RAID-0 to GPT"
-    (echo g) | fdisk /dev/md/RAID-0
+    (echo g; echo w) | fdisk /dev/md/RAID-0
 
     echo -e "\n\nPreparing BOOT partition on /dev/md/RAID-0p1"
     (echo n; echo p; echo 1; echo ; echo +512M; echo t; echo 1; echo w) | fdisk /dev/md/RAID-0
