@@ -2,14 +2,15 @@
 echo -e "\n\n\n\t\t\tArch Linux installer script\n\n\n"
 echo -e "Select an keyboard layout\n1 - english-US(default)\n2 - portuguese-BR:\n"
 read layout
-if [ $layout = $2 ]
+if [ $layout = "2" ]
+then
     loadkeys br-abnt2
 fi
-echo -e "\n\nUpdate system clock"
+echo -e "\n\nUpdating system clock"
 timedatectl set-ntp true
 echo -e "\n\nChecking timedatectl status"
 timedatectl status
-echo -e "\n\nUpdate system and sorts the mirrorlist"
+echo -e "\n\nUpdating system"
 (echo Y) | pacman -Syyu
 main(){    
     echo -e "\n\nSelect an option:\n"
@@ -17,7 +18,8 @@ main(){
     echo -e "2 - Delete partitions in disks"
     echo -e "3 - Mount partitions"
     echo -e "4 - Install base packages"
-    echo -e "5 - Exit\n"
+    echo -e "5 - Finish install(run into Chroot)"
+    echo -e "6 - Exit\n"
     read option        
     case $option in
         "1")
@@ -33,30 +35,26 @@ main(){
          install_base
          ;;
         "5")
+         install_complement
+         ;;
+        "6")
          exit
          ;;
     esac    
     main
 }
 disk_create_partition(){
-    echo -e "\n\nInform the disk for installation:(ex: /dev/sdx)"
-    read disk
-
     echo -e "\n\nPreparing BOOT partition"
-    (echo n; echo 1; echo ; echo +512M; echo t; echo 1; echo w) | fdisk $disk
-    mkfs.fat -F32 -n BOOT $disk"1"
+    (echo n; echo 1; echo ; echo +512M; echo t; echo 1; echo w) | fdisk $disk    
 
     echo -e "\n\nPreparing ROOT partition"
-    (echo n; echo 2; echo ; echo +30G; echo t; echo 2; echo 24; echo w) | fdisk $disk
-    mkfs.ext4 -L ROOT $disk"2"
+    (echo n; echo 2; echo ; echo +30G; echo t; echo 2; echo 24; echo w) | fdisk $disk    
 
     echo -e "\n\nPreparing HOME partition"
-    (echo n; echo 3; echo ; echo +30G; echo t; echo 3; echo 28; echo w) | fdisk $disk
-    mkfs.ext4 -L HOME $disk"3"
+    (echo n; echo 3; echo ; echo +30G; echo t; echo 3; echo 28; echo w) | fdisk $disk    
 
     echo -e "\n\nPreparing SWAP partition"
     (echo n; echo 4; echo ; echo +8G; echo t; echo 4; echo 19; echo w) | fdisk $disk
-    mkswap -L SWAP $disk"4"
 
     echo -e "\n\nSuccessfully created partitions on $disk"
     (echo p) | fdisk $disk
@@ -67,17 +65,32 @@ disk_remove_partition (){
     echo -e "\n\nRemoving partition from $disk"
     (echo d; echo ; echo w) | fdisk $disk
 }
-prepare_partition (){
+prepare_partition (){    
+    echo -e "\n\nInform the disk for installation:(ex: /dev/sdx)"
+    read disk
+
+    echo -e "\n\nDo you want use dual boot?(Y/N)"
+    read resp
+    if [[ $resp = +(Y|y) ]];
+    then
+        echo -e "\n\nInform the partition of boot from secondary system(ex: /dev/sdz)"
+        read boot
+        mkdir /mnt/windows; mount $boot /mnt/windows
+    fi
     echo -e "\n\nCreating directory and mounting BOOT"
-    mkdir -p /mnt/boot/efi && mount $disk"1" /mnt/boot/efi
+    mkfs.fat -F32 -n BOOT $disk"1"
+    mkdir -p /mnt/boot/efi; mount $disk"1" /mnt/boot/efi
 
     echo -e "\n\nCreating directory and mounting ROOT"
-    mkdir /mnt && mount $disk"2" /mnt
+    (echo y) | mkfs.ext4 -L ROOT $disk"2"
+    mkdir /mnt; mount $disk"2" /mnt
 
     echo -e "\n\nCreating directory and mounting HOME"
-    mkdir /mnt/home && mount $disk"3" /mnt/home
+    (echo y) | mkfs.ext4 -L HOME $disk"3"
+    mkdir /mnt/home; mount $disk"3" /mnt/home
 
-    echo -e "\n\nMounting SWAP"
+    echo -e "\n\nMounting SWAP"    
+    mkswap -L SWAP $disk"4"
     swapon $disk"4"
 
     echo -e "\n\nSuccessfully created and assembled directories"
@@ -85,17 +98,40 @@ prepare_partition (){
 }
 install_base(){
 	echo -e "\n\nInstalling base packages"
-	pacstrap -i /mnt base base-devel linux linux-firmware
+	pacstrap -i /mnt base linux linux-firmware
 	
 	echo -e "\n\nAdd mounted disks on FSTAB file"
-	genfstab -U -p /mnt >> /mnt/etc/fstab
+	genfstab -U /mnt >> /mnt/etc/fstab
 	cat /mnt/etc/fstab
 	
-	echo -e "\n\nEntering new system and instaling base packages"
-	arch-chroot /mnt
-	pacman -S grub-efi-x86_64 efibootmgr os-prober ntfs-3g intel-ucode alsa-utils pulseaudio pulseaudio-alsa xorg-server xorg-xinit mesa xf86-video-intel net-tools networkmanager wireless_tools screenfetch vlc p7zip firefox noto-fonts
-	
-	
-		    
+	echo -e "\n\nEntering new system"
+	arch-chroot /mnt	
+}
+install_complement(){	
+        echo -e "\n\nSetting time zone"
+        ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
+        ln -s /usr/share/zoneinfo/Brazil/East/etc/localtime
+        timedatectl set-timezone Brazil/East
+
+        echo -e "\n\nConfigure clock"
+        hwclock --systohc
+        timedatectl set-ntp true
+        timedatectl status
+        
+        echo -e "\n\nSet default keyboard layout"
+        localectl set-keymap --no-convert br-abnt2
+        localectl set-x11-keymap br abnt2
+
+        echo -e "\n\nInstaling base packages"
+        (echo ; echo 1; echo Y) | pacman -S grub-efi-x86_64 efibootmgr os-prober ntfs-3g intel-ucode alsa-utils pulseaudio pulseaudio-alsa xorg-server xorg-xinit mesa xf86-video-intel net-tools networkmanager wireless_tools mdadm screenfetch vlc p7zip firefox noto-fonts
+
+        echo -e "\n\nInstalling GRUB"
+        grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=grub --recheck
+        
+        echo -e "\n\nListing O.Ss"
+        os-prober
+
+        ehco -e "\n\nWriting GRUB configuration"
+        grub-mkconfig -o /boot/grub/grub.cfg
 }
 main
