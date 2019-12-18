@@ -10,8 +10,6 @@ echo -e "\n\nUpdating system clock"
 timedatectl set-ntp true
 echo -e "\n\nChecking timedatectl status"
 timedatectl status
-echo -e "\n\nUpdating system"
-(echo Y) | pacman -Syyu
 main(){    
     echo -e "\n\nSelect an option:\n"
     echo -e "1 - Create partitions in disks"
@@ -97,41 +95,44 @@ prepare_partition (){
     lsblk
 }
 install_base(){
-	echo -e "\n\nInstalling base packages"
-	pacstrap -i /mnt base linux linux-firmware
-	
-	echo -e "\n\nAdd mounted disks on FSTAB file"
-	genfstab -U /mnt >> /mnt/etc/fstab
-	cat /mnt/etc/fstab
-	
-	echo -e "\n\nEntering new system"
-	arch-chroot /mnt	
+    echo -e "\n\nUpdating system"
+    (echo Y) | pacman -Syyu
+
+    echo -e "\n\nInstalling base packages"
+    (echo 1; echo Y) | pacstrap -i /mnt base linux linux-firmware
+
+    echo -e "\n\nAdd mounted disks on FSTAB file"
+    genfstab -U /mnt >> /mnt/etc/fstab
+    cat /mnt/etc/fstab
+
+    echo -e "\n\nEntering new system"
+    arch-chroot /mnt	
 }
 install_complement(){	
-        echo -e "\n\nSetting time zone"
-        ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
-        ln -s /usr/share/zoneinfo/Brazil/East/etc/localtime
-        timedatectl set-timezone Brazil/East
+    echo -e "\n\nSetting time zone"
+    ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
+    ln -s /usr/share/zoneinfo/Brazil/East/etc/localtime
+    timedatectl set-timezone Brazil/East
 
-        echo -e "\n\nConfigure clock"
-        hwclock --systohc
-        timedatectl set-ntp true
-        timedatectl status
-        
-        echo -e "\n\nSet default keyboard layout"
-        localectl set-keymap --no-convert br-abnt2
-        localectl set-x11-keymap br abnt2
+    echo -e "\n\nConfigure clock"
+    hwclock --systohc
+    timedatectl set-ntp true
+    timedatectl status
 
-        echo -e "\n\nInstaling base packages"
-        (echo ; echo 1; echo Y) | pacman -S grub-efi-x86_64 efibootmgr os-prober ntfs-3g intel-ucode alsa-utils pulseaudio pulseaudio-alsa xorg-server xorg-xinit mesa xf86-video-intel net-tools networkmanager wireless_tools mdadm screenfetch vlc p7zip firefox noto-fonts
+    echo -e "\n\nSet default keyboard layout"
+    localectl set-keymap --no-convert br-abnt2
+    localectl set-x11-keymap br abnt2
 
-        echo -e "\n\nInstalling GRUB"
-        grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=grub --recheck
-        
-        echo -e "\n\nListing O.Ss"
-        os-prober
+    echo -e "\n\nInstaling base packages"
+    (echo ; echo 1; echo Y) | pacman -S grub-efi-x86_64 efibootmgr os-prober ntfs-3g intel-ucode alsa-utils pulseaudio pulseaudio-alsa xorg-server xorg-xinit mesa xf86-video-intel net-tools networkmanager wireless_tools mdadm screenfetch vlc p7zip firefox noto-fonts
 
-        ehco -e "\n\nWriting GRUB configuration"
-        grub-mkconfig -o /boot/grub/grub.cfg
+    echo -e "\n\nInstalling GRUB"
+    grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=grub --recheck
+
+    echo -e "\n\nListing O.Ss"
+    os-prober
+
+    ehco -e "\n\nWriting GRUB configuration"
+    grub-mkconfig -o /boot/grub/grub.cfg
 }
 main
