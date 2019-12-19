@@ -8,8 +8,15 @@ then
 fi
 echo -e "\n\nUpdating system clock"
 timedatectl set-ntp true
+
 echo -e "\n\nChecking timedatectl status"
 timedatectl status
+
+echo -e "\n\nSetting time zone to America, Sao Paulo and time zone to Brazil"
+ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
+ln -s /usr/share/zoneinfo/Brazil/East/etc/localtime
+timedatectl set-timezone Brazil/East
+
 main(){    
     echo -e "\n\nSelect an option:\n"
     echo -e "1 - Create partitions in disks"
@@ -104,7 +111,7 @@ prepare_partition (){
 install_base(){
     echo -e "\n\nUpdating system"
     (echo Y) | pacman -Syyu
-
+    
     echo -e "\n\nInstalling base packages"
     (echo 1; echo Y) | pacstrap -i /mnt base linux linux-firmware
 
@@ -117,7 +124,7 @@ install_base(){
 }
 install_complement(){
     echo -e "\n\nInstaling essentials packages"
-    (echo ; echo 1; echo Y) | pacman -S grub-efi-x86_64 efibootmgr os-prober ntfs-3g intel-ucode alsa-utils pulseaudio pulseaudio-alsa xorg-server xorg-xinit mesa xf86-video-intel net-tools networkmanager wireless_tools mdadm screenfetch vlc p7zip firefox noto-fonts git
+    (echo ; echo 1; echo Y) | pacman -S grub-efi-x86_64 efibootmgr os-prober ntfs-3g intel-ucode alsa-utils pulseaudio pulseaudio-alsa xorg-server xorg-xinit mesa xf86-video-intel net-tools networkmanager wireless_tools mdadm screenfetch vlc p7zip firefox noto-fonts git nano vim
     
     echo -e "\n\nInstalling GRUB"
     grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=grub --recheck
@@ -125,7 +132,7 @@ install_complement(){
     echo -e "\n\nListing O.Ss"
     os-prober
 
-    ehco -e "\n\nWriting GRUB configuration"
+    echo -e "\n\nWriting GRUB configuration"
     grub-mkconfig -o /boot/grub/grub.cfg
     
     echo -e "\n\nCompiling boot image"
@@ -142,19 +149,21 @@ install_complement(){
     timedatectl status
     systemctl start dhcpcd
     systemctl enable dhcpcd
+    systemctl enable netctl-auto@interface_wifi
+    systemctl enable netctl-ifplugd@interface_ethernet
 
     echo -e "\n\nSetting keyboard layout to br-abnt2"
     localectl set-keymap --no-convert br-abnt2
     localectl set-x11-keymap br abnt2
     
-    echo -e "\n\nSetting language to pt_BR.UTF-8"
-    sed -i 's/^#pt_BR.UTF-8 UTF-8/pt_BR.UTF-8 UTF-8' /etc/locale.gen > /etc/locale.gen
+    echo -e "\n\nSetting language to pt_BR.UTF-8/g"
+    sed -i 's/^#pt_BR.UTF-8 UTF-8/pt_BR.UTF-8 UTF-8/g' /etc/locale.gen > /etc/locale.gen
     locale-gen
     echo LANG=pt_BR.UTF-8 > /etc/locale.conf
     export LANG=pt_BR.UTF-8
     
     echo -e "\n\nEnabling MULTILIB repository"
-    sed -i 's/^#[multilib]/[multilib]' /etc/pacman.conf > /etc/pacman.conf
+    sed -i 's/^#[multilib]/[multilib]/g' /etc/pacman.conf > /etc/pacman.conf
     
 }
 main
