@@ -89,13 +89,13 @@ prepare_partition (){
         read boot
         mkdir /mnt/windows; mount $boot /mnt/windows
     fi
-    echo -e "\n\nCreating directory and mounting BOOT"
-    mkfs.fat -F32 -n BOOT $disk"1"
-    mkdir -p /mnt/boot/efi; mount $disk"1" /mnt/boot/efi
-
     echo -e "\n\nCreating directory and mounting ROOT"
     (echo y) | mkfs.ext4 -L ROOT $disk"2"
     mkdir /mnt; mount $disk"2" /mnt
+
+    echo -e "\n\nCreating directory and mounting BOOT"
+    mkfs.fat -F32 -n BOOT $disk"1"
+    mkdir -p /mnt/boot/efi; mount $disk"1" /mnt/boot/efi
 
     echo -e "\n\nCreating directory and mounting HOME"
     (echo y) | mkfs.ext4 -L HOME $disk"3"
