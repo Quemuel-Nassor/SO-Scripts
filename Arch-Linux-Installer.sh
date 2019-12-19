@@ -45,6 +45,9 @@ disk_create_partition(){
     echo -e "\n\nInform the disk for create partitions:(ex: /dev/sdx)"
     read disk
 
+    echo -e "\n\nFormating disk to GPT"
+    (echo g; echo w) | fdisk $disk
+
     echo -e "\n\nPreparing BOOT partition"
     (echo n; echo 1; echo ; echo +512M; echo t; echo 1; echo w) | fdisk $disk    
 
