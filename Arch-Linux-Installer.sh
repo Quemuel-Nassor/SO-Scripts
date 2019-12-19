@@ -66,10 +66,14 @@ disk_create_partition(){
 disk_remove_partition (){  
     echo -e "\n\nInform the disk to remove partitions:(ex: /dev/sdx)"
     read disk       
+
     echo -e "\n\nRemoving partition from $disk"
     (echo d; echo ; echo w) | fdisk $disk
 }
 prepare_partition (){    
+    echo -e "\n\nInform the disk for create partitions:(ex: /dev/sdx)"
+    read disk
+    
     echo -e "\n\nDo you want use dual boot?(Y/N)"
     read resp
     if [[ $resp = +(Y|y) ]];
