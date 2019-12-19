@@ -71,7 +71,7 @@ prepare_partition (){
     read resp
     if [[ $resp = +(Y|y) ]];
     then
-        echo -e "\n\nInform the partition of boot from secondary system(ex: /dev/sdz)"
+        echo -e "\n\nInform the partition of boot of Windows(EFI partition)(ex: /dev/sdz)"
         read boot
         mkdir /mnt/windows; mount $boot /mnt/windows
     fi
@@ -108,24 +108,10 @@ install_base(){
     echo -e "\n\nEntering new system"
     arch-chroot /mnt	
 }
-install_complement(){	
-    echo -e "\n\nSetting time zone"
-    ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
-    ln -s /usr/share/zoneinfo/Brazil/East/etc/localtime
-    timedatectl set-timezone Brazil/East
-
-    echo -e "\n\nConfigure clock"
-    hwclock --systohc
-    timedatectl set-ntp true
-    timedatectl status
-
-    echo -e "\n\nSet default keyboard layout"
-    localectl set-keymap --no-convert br-abnt2
-    localectl set-x11-keymap br abnt2
-
-    echo -e "\n\nInstaling base packages"
-    (echo ; echo 1; echo Y) | pacman -S grub-efi-x86_64 efibootmgr os-prober ntfs-3g intel-ucode alsa-utils pulseaudio pulseaudio-alsa xorg-server xorg-xinit mesa xf86-video-intel net-tools networkmanager wireless_tools mdadm screenfetch vlc p7zip firefox noto-fonts
-
+install_complement(){
+    echo -e "\n\nInstaling essentials packages"
+    (echo ; echo 1; echo Y) | pacman -S grub-efi-x86_64 efibootmgr os-prober ntfs-3g intel-ucode alsa-utils pulseaudio pulseaudio-alsa xorg-server xorg-xinit mesa xf86-video-intel net-tools networkmanager wireless_tools mdadm screenfetch vlc p7zip firefox noto-fonts git
+    
     echo -e "\n\nInstalling GRUB"
     grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=grub --recheck
 
@@ -134,5 +120,34 @@ install_complement(){
 
     ehco -e "\n\nWriting GRUB configuration"
     grub-mkconfig -o /boot/grub/grub.cfg
+    
+    echo -e "\n\nCompiling boot image"
+    mkinitcpio -p linux
+
+    echo -e "\n\nSetting time zone to America, Sao Paulo and time zone to Brazil"
+    ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
+    ln -s /usr/share/zoneinfo/Brazil/East/etc/localtime
+    timedatectl set-timezone Brazil/East
+
+    echo -e "\n\nSetting clock and enabling ethernet"
+    hwclock --systohc
+    timedatectl set-ntp true
+    timedatectl status
+    systemctl start dhcpcd
+    systemctl enable dhcpcd
+
+    echo -e "\n\nSetting keyboard layout to br-abnt2"
+    localectl set-keymap --no-convert br-abnt2
+    localectl set-x11-keymap br abnt2
+    
+    echo -e "\n\nSetting language to pt_BR.UTF-8"
+    sed -i 's/^#pt_BR.UTF-8 UTF-8/pt_BR.UTF-8 UTF-8' /etc/locale.gen > /etc/locale.gen
+    locale-gen
+    echo LANG=pt_BR.UTF-8 > /etc/locale.conf
+    export LANG=pt_BR.UTF-8
+    
+    echo -e "\n\nEnabling MULTILIB repository"
+    sed -i 's/^#[multilib]/[multilib]' /etc/pacman.conf > /etc/pacman.conf
+    
 }
 main
