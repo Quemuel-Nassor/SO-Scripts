@@ -113,7 +113,7 @@ install_base(){
     (echo Y) | pacman -Syyu
     
     echo -e "\n\nInstalling base packages"
-    (echo 1; echo Y) | pacstrap -i /mnt base linux linux-firmware
+    pacstrap /mnt base linux linux-firmware
 
     echo -e "\n\nAdd mounted disks on FSTAB file"
     genfstab -U /mnt >> /mnt/etc/fstab
@@ -125,7 +125,9 @@ install_base(){
 install_complement(){
     echo -e "\n\nInstaling essentials packages"
     (echo ; echo 1; echo Y) | pacman -S grub-efi-x86_64 efibootmgr os-prober ntfs-3g intel-ucode alsa-utils pulseaudio pulseaudio-alsa xorg-server xorg-xinit mesa xf86-video-intel net-tools networkmanager wireless_tools mdadm screenfetch vlc p7zip firefox noto-fonts git nano vim
-    
+    finish_install
+} 
+finish_install(){
     echo -e "\n\nInstalling GRUB"
     grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=grub --recheck
 
