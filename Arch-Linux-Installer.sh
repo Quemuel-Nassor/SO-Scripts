@@ -48,7 +48,7 @@ main(){
          create_user
          ;;
         "7")
-         (echo "root";echo ) | create_user
+         (echo "root";) | set_passwd
          ;;
         "8")
          exit
@@ -157,8 +157,7 @@ finish_install(){
     hwclock --systohc
     timedatectl set-ntp true
     timedatectl status
-    systemctl start dhcpcd
-    systemctl enable dhcpcd
+    systemctl enable NetworkManager.service
     systemctl enable netctl-auto@interface_wifi
     systemctl enable netctl-ifplugd@interface_ethernet
 
@@ -178,13 +177,14 @@ finish_install(){
 }
 create_user(){
     echo -e "\n\nEnter username"
-    read name
-    (echo ;) | useradd -m -g users -G wheel -s /bin/bash $name
-    set_passwd
+    read username
+    (echo ;) | useradd -m -g users -G wheel -s /bin/bash $username
+    (echo $username) | set_passwd
 }
 set_passwd(){
+    read username
     echo -e "\n\nEnter password"
     read password
-    (echo $passwd; echo $passwd; echo ) | passwd $name
+    (echo $password; echo $password; echo ) | passwd $username
 }
 main
