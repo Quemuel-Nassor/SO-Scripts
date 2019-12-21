@@ -24,7 +24,9 @@ main(){
     echo -e "3 - Mount partitions"
     echo -e "4 - Install base packages"
     echo -e "5 - Finish install(run into Chroot)"
-    echo -e "6 - Exit\n"
+    echo -e "6 - Create new user"
+    echo -e "7 - Set ROOT user password"
+    echo -e "8 - Exit\n"
     read option        
     case $option in
         "1")
@@ -43,6 +45,12 @@ main(){
          install_complement
          ;;
         "6")
+         create_user
+         ;;
+        "7")
+         (echo "root";echo ) | create_user
+         ;;
+        "8")
          exit
          ;;
     esac    
@@ -167,5 +175,16 @@ finish_install(){
     echo -e "\n\nEnabling MULTILIB repository"
     sed -i 's/^#[multilib]/[multilib]/g' /etc/pacman.conf > /etc/pacman.conf
     
+}
+create_user(){
+    echo -e "\n\nEnter username"
+    read name
+    (echo ;) | useradd -m -g users -G wheel -s /bin/bash $name
+    set_passwd
+}
+set_passwd(){
+    echo -e "\n\nEnter password"
+    read password
+    (echo $passwd; echo $passwd; echo ) | passwd $name
 }
 main
