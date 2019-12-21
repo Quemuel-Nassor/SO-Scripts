@@ -17,6 +17,10 @@ ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
 ln -s /usr/share/zoneinfo/Brazil/East/etc/localtime
 timedatectl set-timezone Brazil/East
 
+username=""
+password=""
+
+
 main(){    
     echo -e "\n\nSelect an option:\n"
     echo -e "1 - Create partitions in disks"
@@ -48,7 +52,7 @@ main(){
          create_user
          ;;
         "7")
-         (echo "root";) | set_passwd
+         username="root"; set_passwd
          ;;
         "8")
          exit
@@ -179,10 +183,9 @@ create_user(){
     echo -e "\n\nEnter username"
     read username
     (echo ;) | useradd -m -g users -G wheel -s /bin/bash $username
-    (echo $username) | set_passwd
+    set_passwd
 }
 set_passwd(){
-    read username
     echo -e "\n\nEnter password"
     read password
     (echo $password; echo $password; echo ) | passwd $username
