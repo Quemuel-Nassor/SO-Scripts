@@ -9,7 +9,7 @@ main(){
     echo -e "3 - Create RAID-0"
     echo -e "4 - Delete RAID-0"
     echo -e "5 - Configure RAID-0"
-    echo -e "6 - Create RAID partitions to install Linux"
+    echo -e "6 - Create RAID partitions to install Linux (UEFI)"
     echo -e "7 - Show disks online"
     echo -e "8 - Prepare partitions to install Linux"
     echo -e "9 - Exit\n"
@@ -115,13 +115,14 @@ prepare_partition (){
     mdadm --detail /dev/md/RAID-0 | grep 'Chunk Size'
     echo -e "\n\nType the value of Chunk Size in bytes:(ex: 512K => 512000)"
     read chunk
-    echo -e "\n\nCreating directory and mounting BOOT"
-    mkfs.fat -F32 -v -n BOOT /dev/md/RAID-0p1
-    mkdir -p /mnt/boot/efi; mount /dev/md/RAID-0p1 /mnt/boot/efi
-
+    
     echo -e "\n\nCreating directory and mounting ROOT"
     (echo y) | mkfs.ext4 -v -L ROOT -m 0.5 -b 4096 -E stride=$((chunk/4096)),stripe-width=$(((chunk/4096)*2)) /dev/md/RAID-0p2
     mkdir /mnt; mount /dev/md/RAID-0p2 /mnt
+
+    echo -e "\n\nCreating directory and mounting BOOT"
+    mkfs.fat -F32 -v -n BOOT /dev/md/RAID-0p1
+    mkdir -p /mnt/boot/efi; mount /dev/md/RAID-0p1 /mnt/boot/efi
 
     echo -e "\n\nCreating directory and mounting HOME"
     (echo y) | mkfs.ext4 -v -L HOME -m 0.5 -b 4096 -E stride=$((chunk/4096)),stripe-width=$(((chunk/4096)*2)) /dev/md/RAID-0p3
