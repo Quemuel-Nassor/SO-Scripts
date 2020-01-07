@@ -18,8 +18,8 @@ choco install vscode -y
 choco install 7zip -y
 choco install discord -y
 choco install git -y
-choco install javaruntime
-choco install jdk8
+choco install javaruntime -y
+choco install jdk8 -y
 choco install driverbooster -y
 choco install google-backup-and-sync -y
 choco install virtualbox -y
