@@ -12,14 +12,17 @@ timedatectl set-ntp true
 echo -e "\n\nChecking timedatectl status"
 timedatectl status
 
-echo -e "\n\nSetting time zone to America, Sao Paulo and time zone to Brazil"
+echo -e "\n\nSetting time zone to America, Sao Paulo"
 ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
-ln -s /usr/share/zoneinfo/Brazil/East/etc/localtime
-timedatectl set-timezone Brazil/East
 
+#Global inputs variables
 username=""
 password=""
-
+disk=""
+SWAP="" 
+HOME="" 
+ROOT="" 
+BOOT=""
 
 main(){    
     echo -e "\n\nSelect an option:\n"
@@ -30,7 +33,8 @@ main(){
     echo -e "5 - Finish install(run into Chroot)"
     echo -e "6 - Create new user"
     echo -e "7 - Set ROOT user password"
-    echo -e "8 - Exit\n"
+    echo -e "8 - Configurate system"
+    echo -e "9 - Exit\n"
     read option        
     case $option in
         "1")
@@ -55,6 +59,9 @@ main(){
          username="root"; set_passwd
          ;;
         "8")
+         system_config
+         ;;
+        "9")
          exit
          ;;
     esac    
@@ -63,35 +70,53 @@ main(){
 disk_create_partition(){
     echo -e "\n\nInform the disk for create partitions:(ex: /dev/sdx)"
     read disk
+    
+    echo -e "\n\nDo you want to format the entire disk for GPT?"
+    read response
+    if [[ $response = +(Y|y) ]];
+    then
+        echo -e "\n\nFormating disk to GPT"
+        (echo g; echo w) | fdisk $disk
+    fi
+    
+    lsblk
+    echo -e "\n\nInform the partition number for BOOT"
+    read BOOT
+    
+    echo -e "\n\nCreating BOOT partition"
+    (echo n; echo $BOOT; echo ; echo +512M; echo t; echo $BOOT; echo 1; echo w) | fdisk $disk    
+    
+    echo -e "\n\nInform the partition number for ROOT"
+    read ROOT
+    
+    echo -e "\n\nCreating ROOT partition"
+    (echo n; echo $ROOT; echo ; echo +30G; echo t; echo $ROOT; echo 24; echo w) | fdisk $disk    
+    
+    echo -e "\n\nInform the partition number for HOME"
+    read HOME
+    
+    echo -e "\n\nCreating HOME partition"
+    (echo n; echo $HOME; echo ; echo +30G; echo t; echo $HOME; echo 28; echo w) | fdisk $disk    
 
-    echo -e "\n\nFormating disk to GPT"
-    (echo g; echo w) | fdisk $disk
-
-    echo -e "\n\nPreparing BOOT partition"
-    (echo n; echo 1; echo ; echo +512M; echo t; echo 1; echo w) | fdisk $disk    
-
-    echo -e "\n\nPreparing ROOT partition"
-    (echo n; echo 2; echo ; echo +30G; echo t; echo 2; echo 24; echo w) | fdisk $disk    
-
-    echo -e "\n\nPreparing HOME partition"
-    (echo n; echo 3; echo ; echo +30G; echo t; echo 3; echo 28; echo w) | fdisk $disk    
-
-    echo -e "\n\nPreparing SWAP partition"
-    (echo n; echo 4; echo ; echo +8G; echo t; echo 4; echo 19; echo w) | fdisk $disk
+    echo -e "\n\nInform the partition number for SWAP"
+    read SWAP
+    
+    echo -e "\n\nCreating SWAP partition"
+    (echo n; echo $SWAP; echo ; echo +8G; echo t; echo $SWAP; echo 19; echo w) | fdisk $disk
 
     echo -e "\n\nSuccessfully created partitions on $disk"
     (echo p) | fdisk $disk
 }
 disk_remove_partition (){  
     echo -e "\n\nInform the disk to remove partitions:(ex: /dev/sdx)"
-    read disk       
+    read d
+    echo -e "\n\nInform the partition to remove:(ex: 1, 2, etc...)"
+    read p
 
-    echo -e "\n\nRemoving partition from $disk"
-    (echo d; echo ; echo w) | fdisk $disk
+    echo -e "\n\nRemoving partition from $d"
+    (echo d; echo $p; echo w) | fdisk $d
 }
 prepare_partition (){    
-    echo -e "\n\nInform the disk for create partitions:(ex: /dev/sdx)"
-    read disk
     
     echo -e "\n\nDo you want use dual boot?(Y/N)"
     read resp
@@ -102,20 +127,20 @@ prepare_partition (){
         mkdir /mnt/windows; mount $boot /mnt/windows
     fi
     echo -e "\n\nCreating directory and mounting ROOT"
-    (echo y) | mkfs.ext4 -L ROOT $disk"2"
-    mkdir /mnt; mount $disk"2" /mnt
+    (echo y) | mkfs.ext4 -L ROOT $disk$ROOT
+    mkdir /mnt; mount $disk$ROOT /mnt
 
     echo -e "\n\nCreating directory and mounting BOOT"
-    mkfs.fat -F32 -n BOOT $disk"1"
-    mkdir -p /mnt/boot/efi; mount $disk"1" /mnt/boot/efi
+    mkfs.fat -F32 -n BOOT $disk$BOOT
+    mkdir -p /mnt/boot/efi; mount $disk$BOOT /mnt/boot/efi
 
     echo -e "\n\nCreating directory and mounting HOME"
-    (echo y) | mkfs.ext4 -L HOME $disk"3"
-    mkdir /mnt/home; mount $disk"3" /mnt/home
+    (echo y) | mkfs.ext4 -L HOME $disk$HOME
+    mkdir /mnt/home; mount $disk$HOME /mnt/home
 
     echo -e "\n\nMounting SWAP"    
-    mkswap -L SWAP $disk"4"
-    swapon $disk"4"
+    mkswap -L SWAP $disk$SWAP
+    swapon $disk$SWAP
 
     echo -e "\n\nSuccessfully created and assembled directories"
     lsblk
@@ -136,7 +161,7 @@ install_base(){
 }
 install_complement(){
     echo -e "\n\nInstaling essentials packages"
-    (echo ; echo 1; echo Y) | pacman -S grub-efi-x86_64 efibootmgr os-prober ntfs-3g intel-ucode alsa-utils pulseaudio pulseaudio-alsa xorg-server xorg-xinit mesa xf86-video-intel net-tools networkmanager wireless_tools mdadm screenfetch vlc p7zip firefox noto-fonts git nano vim
+    (echo ; echo 1; echo Y) | pacman -S grub-efi-x86_64 efibootmgr os-prober ntfs-3g intel-ucode alsa-utils pulseaudio pulseaudio-alsa xorg-server xorg-xinit xorg-xrandr arandr mesa xf86-video-intel net-tools networkmanager wireless_tools dhcpcd screenfetch vlc p7zip firefox noto-fonts git nano vim xbindkeys 
     finish_install
 } 
 finish_install(){
@@ -151,25 +176,31 @@ finish_install(){
     
     echo -e "\n\nCompiling boot image"
     mkinitcpio -p linux
+}
+
+system_config(){
 
     echo -e "\n\nSetting time zone to America, Sao Paulo and time zone to Brazil"
     ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
-    ln -s /usr/share/zoneinfo/Brazil/East/etc/localtime
-    timedatectl set-timezone Brazil/East
-
+    
     echo -e "\n\nSetting clock and enabling ethernet"
     hwclock --systohc
     timedatectl set-ntp true
     timedatectl status
+    systemclt enable dhcpcd.service
+    systemclt start dhcpcd.service
     systemctl enable NetworkManager.service
+    systemctl start NetworkManager.service
     systemctl enable netctl-auto@interface_wifi
+    systemctl start netctl-auto@interface_wifi
     systemctl enable netctl-ifplugd@interface_ethernet
-
+    systemctl start netctl-ifplugd@interface_ethernet
+    
     echo -e "\n\nSetting keyboard layout to br-abnt2"
     localectl set-keymap --no-convert br-abnt2
     localectl set-x11-keymap br abnt2
     
-    echo -e "\n\nSetting language to pt_BR.UTF-8/g"
+    echo -e "\n\nSetting language to pt_BR.UTF-8"
     sed -i 's/^#pt_BR.UTF-8 UTF-8/pt_BR.UTF-8 UTF-8/g' /etc/locale.gen > /etc/locale.gen
     locale-gen
     echo LANG=pt_BR.UTF-8 > /etc/locale.conf
