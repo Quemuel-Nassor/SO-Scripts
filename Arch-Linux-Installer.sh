@@ -161,7 +161,9 @@ install_base(){
 }
 install_complement(){
     echo -e "\n\nInstaling essentials packages"
-    (echo ; echo 1; echo Y) | pacman -S grub-efi-x86_64 efibootmgr os-prober ntfs-3g intel-ucode alsa-utils pulseaudio pulseaudio-alsa xorg-server xorg-xinit xorg-xrandr arandr mesa xf86-video-intel net-tools networkmanager wireless_tools dhcpcd screenfetch vlc p7zip firefox noto-fonts git nano vim xbindkeys 
+    (echo ; echo 1; echo Y) | pacman -S grub-efi-x86_64 efibootmgr os-prober ntfs-3g intel-ucode alsa-utils pulseaudio pulseaudio-alsa xorg-server xorg-xinit xorg-xrandr arandr mesa xf86-video-intel net-tools networkmanager wireless_tools dhcpcd nano vim
+    # Remove the comment to install these packages
+    #(echo ; echo 1; echo Y) | pacman -S screenfetch vlc p7zip firefox noto-fonts git xbindkeys htop lightdm lm-sensors acpi i3status i3lock i3-wm xfce4-terminal xorg-twm xterm xclock xorg-xinit
     finish_install
 } 
 finish_install(){
@@ -195,6 +197,8 @@ system_config(){
     systemctl start netctl-auto@interface_wifi
     systemctl enable netctl-ifplugd@interface_ethernet
     systemctl start netctl-ifplugd@interface_ethernet
+    systemctl start lightdm.service
+    systemctl enable lightdm.service
     
     echo -e "\n\nSetting keyboard layout to br-abnt2"
     localectl set-keymap --no-convert br-abnt2
