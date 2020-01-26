@@ -197,8 +197,8 @@ system_config(){
     systemctl start netctl-auto@interface_wifi
     systemctl enable netctl-ifplugd@interface_ethernet
     systemctl start netctl-ifplugd@interface_ethernet
-    systemctl start lightdm.service
-    systemctl enable lightdm.service
+    systemctl start sddm.service
+    systemctl enable sddm.service
     
     echo -e "\n\nSetting keyboard layout to br-abnt2"
     localectl set-keymap --no-convert br-abnt2
