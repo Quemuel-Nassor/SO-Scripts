@@ -193,10 +193,6 @@ system_config(){
     systemclt start dhcpcd.service
     systemctl enable NetworkManager.service
     systemctl start NetworkManager.service
-    systemctl enable netctl-auto@interface_wifi
-    systemctl start netctl-auto@interface_wifi
-    systemctl enable netctl-ifplugd@interface_ethernet
-    systemctl start netctl-ifplugd@interface_ethernet
     systemctl start sddm.service
     systemctl enable sddm.service
     systemctl enable ntpd.service
