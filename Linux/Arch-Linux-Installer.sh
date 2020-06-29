@@ -74,7 +74,6 @@ disk_create_partition(){
     getMem=$(grep MemTotal /proc/meminfo)
     swap=${getMem:9:${#getMem[@]}-3}
     swap=$(($swap/1000))"M"
-    echo -e "swap ->" $swap
 
     echo -e "\n\nInform the disk for create partitions:(ex: /dev/sdx)"
     read disk
