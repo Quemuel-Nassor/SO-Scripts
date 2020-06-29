@@ -73,9 +73,8 @@ disk_create_partition(){
     home_size="30G"
     getMem=$(grep MemTotal /proc/meminfo)
     swap=${getMem:9:${#getMem[@]}-3}
-    swap=$(($swap/8))"B"
+    swap=$(($swap/1000))"M"
     echo -e "swap ->" $swap
-
 
     echo -e "\n\nInform the disk for create partitions:(ex: /dev/sdx)"
     read disk
@@ -115,7 +114,7 @@ disk_create_partition(){
     (echo n; echo ; echo ; echo +$home_size; echo t; echo ; echo 28; echo w) | fdisk $disk    
 
     echo -e "\n\nCreating SWAP partition"
-    (echo n; echo ; echo ; echo +8G; echo t; echo ; echo 19; echo w) | fdisk $disk
+    (echo n; echo ; echo ; echo +$swap; echo t; echo ; echo 19; echo w) | fdisk $disk
 
     echo -e "\n\nSuccessfully created partitions on $disk"
     (echo p) | fdisk $disk
