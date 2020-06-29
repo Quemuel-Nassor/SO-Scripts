@@ -68,41 +68,54 @@ main(){
     main
 }
 disk_create_partition(){
+
+    root_size="30G"
+    home_size="30G"
+    getMem=$(grep MemTotal /proc/meminfo)
+    swap=${getMem:9:${#getMem[@]}-3}
+    swap=$(($swap/8))"B"
+    echo -e "swap ->" $swap
+
+
     echo -e "\n\nInform the disk for create partitions:(ex: /dev/sdx)"
     read disk
     
-    echo -e "\n\nDo you want to format the entire disk for GPT?"
-    read response
-    if [[ $response = +(Y|y) ]];
-    then
-        echo -e "\n\nFormating disk to GPT"
-        (echo g; echo w) | fdisk $disk
-    fi
+    # echo -e "\n\nDo you want to format the entire disk for GPT?(Y/N)"
+    # read response
+    # if [[ $response = +(Y|y) ]];
+    # then
+    echo -e "\n\nFormating disk to GPT"
+    (echo g; echo w) | fdisk $disk
+    # fi
     
     lsblk
-    echo -e "\n\nInform the partition number for BOOT"
-    read BOOT
+    echo -e "\n\nEnter the /ROOT size or press Enter to keep the default: (ex 30G, 500M ...)"
+    read input
+    
+    if [[ $input != "" ]];
+    then
+        root_size=$input
+    fi
+
+    echo -e "\n\nEnter the /HOME size or press Enter to keep the default: (ex 30G, 500M ...)"
+    read input
+
+    if [[ $input != "" ]];
+    then
+        home_size=$input
+    fi
     
     echo -e "\n\nCreating BOOT partition"
-    (echo n; echo $BOOT; echo ; echo +512M; echo t; echo $BOOT; echo 1; echo w) | fdisk $disk    
-    
-    echo -e "\n\nInform the partition number for ROOT"
-    read ROOT
+    (echo n; echo ; echo ; echo +512M; echo t; echo 1; echo w) | fdisk $disk    
     
     echo -e "\n\nCreating ROOT partition"
-    (echo n; echo $ROOT; echo ; echo +30G; echo t; echo $ROOT; echo 24; echo w) | fdisk $disk    
-    
-    echo -e "\n\nInform the partition number for HOME"
-    read HOME
+    (echo n; echo ; echo ; echo +$root_size; echo t; echo ; echo 24; echo w) | fdisk $disk    
     
     echo -e "\n\nCreating HOME partition"
-    (echo n; echo $HOME; echo ; echo +30G; echo t; echo $HOME; echo 28; echo w) | fdisk $disk    
+    (echo n; echo ; echo ; echo +$home_size; echo t; echo ; echo 28; echo w) | fdisk $disk    
 
-    echo -e "\n\nInform the partition number for SWAP"
-    read SWAP
-    
     echo -e "\n\nCreating SWAP partition"
-    (echo n; echo $SWAP; echo ; echo +8G; echo t; echo $SWAP; echo 19; echo w) | fdisk $disk
+    (echo n; echo ; echo ; echo +8G; echo t; echo ; echo 19; echo w) | fdisk $disk
 
     echo -e "\n\nSuccessfully created partitions on $disk"
     (echo p) | fdisk $disk
@@ -160,6 +173,9 @@ install_base(){
     arch-chroot /mnt	
 }
 install_complement(){
+    echo -e "\n\nValidating package signing"
+    pacman-key --populate archlinux
+    
     echo -e "\n\nInstaling essentials packages"
     (echo ; echo 1; echo Y) | pacman -S grub-efi-x86_64 efibootmgr os-prober ntfs-3g intel-ucode alsa-utils pulseaudio pulseaudio-alsa xorg-server xorg-xinit xorg-xrandr arandr mesa xf86-video-intel iprout2 networkmanager wireless_tools ntp dhcpcd nano vim
     # Remove the comment to install these packages
