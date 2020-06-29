@@ -138,20 +138,20 @@ prepare_partition (){
         mkdir /mnt/windows; mount $boot /mnt/windows
     fi
     echo -e "\n\nCreating directory and mounting ROOT"
-    (echo y) | mkfs.ext4 -L ROOT $disk$ROOT
-    mkdir /mnt; mount $disk$ROOT /mnt
+    (echo y) | mkfs.ext4 -L ROOT $disk"2"
+    mkdir /mnt; mount $disk"2" /mnt
 
     echo -e "\n\nCreating directory and mounting BOOT"
-    mkfs.fat -F32 -n BOOT $disk$BOOT
-    mkdir -p /mnt/boot/efi; mount $disk$BOOT /mnt/boot/efi
+    mkfs.fat -F32 -n BOOT $disk"1"
+    mkdir -p /mnt/boot/efi; mount $disk"1" /mnt/boot/efi
 
     echo -e "\n\nCreating directory and mounting HOME"
-    (echo y) | mkfs.ext4 -L HOME $disk$HOME
-    mkdir /mnt/home; mount $disk$HOME /mnt/home
+    (echo y) | mkfs.ext4 -L HOME $disk"3"
+    mkdir /mnt/home; mount $disk"3" /mnt/home
 
     echo -e "\n\nMounting SWAP"    
-    mkswap -L SWAP $disk$SWAP
-    swapon $disk$SWAP
+    mkswap -L SWAP $disk"4"
+    swapon $disk"4"
 
     echo -e "\n\nSuccessfully created and assembled directories"
     lsblk
