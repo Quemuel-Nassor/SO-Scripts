@@ -20,9 +20,6 @@ username=""
 password=""
 disk=""
 SWAP="" 
-HOME="" 
-ROOT="" 
-BOOT=""
 
 main(){    
     echo -e "\n\nSelect an option:\n"
@@ -157,8 +154,14 @@ prepare_partition (){
     lsblk
 }
 install_base(){
+
     echo -e "\n\nUpdating system"
     (echo Y) | pacman -Syyu
+
+    cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
+    sed -i 's/^#Server/Server/' /etc/pacman.d/mirrorlist.backup
+    rankmirrors -n 10 /etc/pacman.d/mirrorlist.backup > /etc/pacman.d/mirrorlist
+    # rm /etc/pacman.d/mirrorlist.backup
     
     echo -e "\n\nInstalling base packages"
     pacstrap /mnt base linux linux-firmware
