@@ -158,10 +158,10 @@ install_base(){
     
     (echo Y) | pacman -Sy pacman-contrib
 
-    cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
-    sed -i 's/^#Server/Server/' /etc/pacman.d/mirrorlist.backup
-    rankmirrors -n 10 /etc/pacman.d/mirrorlist.backup > /etc/pacman.d/mirrorlist
-    rm /etc/pacman.d/mirrorlist.backup
+    cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bkp
+    sed -i 's/^#Server/Server/' /etc/pacman.d/mirrorlist.bkp
+    rankmirrors /etc/pacman.d/mirrorlist.bkp > /etc/pacman.d/mirrorlist
+    rm /etc/pacman.d/mirrorlist.bkp
 
     echo -e "\n\nUpdating system"
     (echo Y) | pacman -Syyu
@@ -182,7 +182,7 @@ install_complement(){
     pacman-key --populate archlinux
     
     echo -e "\n\nInstaling essentials packages"
-    (echo ; echo 1; echo Y) | pacman -S grub-efi-x86_64 efibootmgr os-prober ntfs-3g intel-ucode alsa-utils pulseaudio pulseaudio-alsa xorg-server xorg-xinit xorg-xrandr arandr mesa xf86-video-intel iprout2 networkmanager wireless_tools ntp dhcpcd nano vim
+    (echo ; echo 1; echo Y) | pacman -S grub-efi-x86_64 efibootmgr os-prober pacman-contrib ntfs-3g intel-ucode alsa-utils pulseaudio pulseaudio-alsa xorg-server xorg-xinit xorg-xrandr arandr mesa xf86-video-intel iprout2 networkmanager wireless_tools ntp dhcpcd nano vim
     # Remove the comment to install these packages
     #(echo ; echo 1; echo Y) | pacman -S screenfetch vlc p7zip firefox noto-fonts git xbindkeys htop sddm lm-sensors acpi i3status i3lock i3-wm xfce4-terminal xorg-twm xterm xclock xorg-xinit 
     finish_install
