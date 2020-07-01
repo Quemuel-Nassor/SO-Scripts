@@ -155,18 +155,22 @@ prepare_partition (){
 }
 install_base(){
 
-    echo -e "\n\nUpdating system"
-    (echo Y) | pacman -Syyu
+    
+    (echo Y) | pacman -Sy pacman-contrib
 
     cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
     sed -i 's/^#Server/Server/' /etc/pacman.d/mirrorlist.backup
     rankmirrors -n 10 /etc/pacman.d/mirrorlist.backup > /etc/pacman.d/mirrorlist
-    # rm /etc/pacman.d/mirrorlist.backup
+    rm /etc/pacman.d/mirrorlist.backup
+
+    echo -e "\n\nUpdating system"
+    (echo Y) | pacman -Syyu
     
     echo -e "\n\nInstalling base packages"
     pacstrap /mnt base linux linux-firmware
 
     echo -e "\n\nAdd mounted disks on FSTAB file"
+    rm /mnt/etc/fstab
     genfstab -U /mnt >> /mnt/etc/fstab
     cat /mnt/etc/fstab
 
