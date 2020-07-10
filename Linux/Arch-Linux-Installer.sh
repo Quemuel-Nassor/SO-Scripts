@@ -67,7 +67,7 @@ main(){
 disk_create_partition(){
 
     root_size="30G"
-    home_size="30G"
+    home_size=""
     getMem=$(grep MemTotal /proc/meminfo)
     swap=${getMem:9:${#getMem[@]}-3}
     swap=$(($swap/1000))"M"
@@ -106,11 +106,13 @@ disk_create_partition(){
     echo -e "\n\nCreating ROOT partition"
     (echo n; echo ; echo ; echo +$root_size; echo t; echo ; echo 24; echo w) | fdisk $disk    
     
+    echo -e "\n\nCreating SWAP partition"
+    (echo n; echo ; echo ; echo +$swap; echo t; echo ; echo 19; echo w) | fdisk $disk
+
     echo -e "\n\nCreating HOME partition"
     (echo n; echo ; echo ; echo +$home_size; echo t; echo ; echo 28; echo w) | fdisk $disk    
 
-    echo -e "\n\nCreating SWAP partition"
-    (echo n; echo ; echo ; echo +$swap; echo t; echo ; echo 19; echo w) | fdisk $disk
+    
 
     echo -e "\n\nSuccessfully created partitions on $disk"
     (echo p) | fdisk $disk
@@ -134,21 +136,22 @@ prepare_partition (){
         read boot
         mkdir /mnt/windows; mount $boot /mnt/windows
     fi
-    echo -e "\n\nCreating directory and mounting ROOT"
-    (echo y) | mkfs.ext4 -L ROOT $disk"2"
-    mkdir /mnt; mount $disk"2" /mnt
 
     echo -e "\n\nCreating directory and mounting BOOT"
     mkfs.fat -F32 -n BOOT $disk"1"
     mkdir -p /mnt/boot/efi; mount $disk"1" /mnt/boot/efi
 
+    echo -e "\n\nMounting ROOT"
+    (echo y) | mkfs.ext4 -L ROOT $disk"2"
+    mount $disk"2" /mnt
+
     echo -e "\n\nCreating directory and mounting HOME"
-    (echo y) | mkfs.ext4 -L HOME $disk"3"
-    mkdir /mnt/home; mount $disk"3" /mnt/home
+    (echo y) | mkfs.ext4 -L HOME $disk"4"
+    mkdir /mnt/home; mount $disk"4" /mnt/home
 
     echo -e "\n\nMounting SWAP"    
-    mkswap -L SWAP $disk"4"
-    swapon $disk"4"
+    mkswap -L SWAP $disk"3"
+    swapon $disk"3"
 
     echo -e "\n\nSuccessfully created and assembled directories"
     lsblk
@@ -156,18 +159,18 @@ prepare_partition (){
 install_base(){
 
     
-    (echo Y) | pacman -Sy pacman-contrib
+    # (echo Y) | pacman -Sy pacman-contrib
 
-    cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bkp
-    sed -i 's/^#Server/Server/' /etc/pacman.d/mirrorlist.bkp
-    rankmirrors /etc/pacman.d/mirrorlist.bkp > /etc/pacman.d/mirrorlist
-    rm /etc/pacman.d/mirrorlist.bkp
+    # cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bkp
+    # sed -i 's/^#Server/Server/' /etc/pacman.d/mirrorlist.bkp
+    # rankmirrors /etc/pacman.d/mirrorlist.bkp > /etc/pacman.d/mirrorlist
+    # rm /etc/pacman.d/mirrorlist.bkp
 
     echo -e "\n\nUpdating system"
-    (echo Y) | pacman -Syyu
+    # (echo Y) | pacman -Syyu
     
     echo -e "\n\nInstalling base packages"
-    pacstrap /mnt base linux linux-firmware
+    pacstrap /mnt base linux linux-firmware nano
 
     echo -e "\n\nAdd mounted disks on FSTAB file"
     rm /mnt/etc/fstab
@@ -182,7 +185,9 @@ install_complement(){
     pacman-key --populate archlinux
     
     echo -e "\n\nInstaling essentials packages"
-    (echo ; echo 1; echo Y) | pacman -S grub-efi-x86_64 efibootmgr os-prober pacman-contrib ntfs-3g intel-ucode alsa-utils pulseaudio pulseaudio-alsa xorg-server xorg-xinit xorg-xrandr arandr mesa xf86-video-intel iprout2 networkmanager wireless_tools ntp dhcpcd nano vim
+    (echo ; echo 1; echo Y) | pacman -S grub-efi-x86_64 efibootmgr os-prober pacman-contrib ntfs-3g intel-ucode alsa-utils 
+    pulseaudio pulseaudio-alsa xorg-server xorg-xinit xorg-xrandr arandr mesa xf86-video-intel iprout2 networkmanager 
+    wireless_tools ntp dhcpcd nano vim
     # Remove the comment to install these packages
     #(echo ; echo 1; echo Y) | pacman -S screenfetch vlc p7zip firefox noto-fonts git xbindkeys htop sddm lm-sensors acpi i3status i3lock i3-wm xfce4-terminal xorg-twm xterm xclock xorg-xinit 
     finish_install
@@ -226,6 +231,11 @@ system_config(){
     sed -i 's/^#pt_BR.UTF-8 UTF-8/pt_BR.UTF-8 UTF-8/g' /etc/locale.gen > /etc/locale.gen
     locale-gen
     echo LANG=pt_BR.UTF-8 > /etc/locale.conf
+    echo KEYMAP=br-abnt2 > /etc/vconsole.conf
+    echo ArchLinuxPC > /etc/hostname
+    echo -e "127.0.0.1	localhost\n::1 	localhost\n127.0.1.1	ArchLinuxPC" > /etc/hosts
+
+    #configurate the current shell to selected language
     export LANG=pt_BR.UTF-8
     
     echo -e "\n\nEnabling MULTILIB repository"
