@@ -170,7 +170,7 @@ install_base(){
     # (echo Y) | pacman -Syyu
     
     echo -e "\n\nInstalling base packages"
-    pacstrap /mnt base linux linux-firmware nano
+    pacstrap /mnt base base-devel linux linux-firmware nano dhcpcd
 
     echo -e "\n\nAdd mounted disks on FSTAB file"
     rm /mnt/etc/fstab
@@ -186,10 +186,10 @@ install_complement(){
     
     echo -e "\n\nInstaling essentials packages"
     (echo ; echo 1; echo Y) | pacman -S grub-efi-x86_64 efibootmgr os-prober pacman-contrib ntfs-3g intel-ucode alsa-utils 
-    pulseaudio pulseaudio-alsa xorg-server xorg-xinit xorg-xrandr arandr mesa xf86-video-intel iprout2 networkmanager 
+    pulseaudio pulseaudio-alsa pavucontrol xorg-server xorg-xinit xorg-xrandr arandr mesa xf86-video-intel iprout2 networkmanager 
     wireless_tools ntp dhcpcd nano vim
     # Remove the comment to install these packages
-    #(echo ; echo 1; echo Y) | pacman -S screenfetch vlc p7zip firefox noto-fonts git xbindkeys htop sddm lm-sensors acpi i3status i3lock i3-wm xfce4-terminal xorg-twm xterm xclock xorg-xinit 
+    #(echo ; echo 1; echo Y) | pacman -S feh screenfetch vlc p7zip firefox noto-fonts git xbindkeys htop sddm lm-sensors acpi i3status i3lock i3-wm xfce4-terminal xorg-twm xterm xclock xorg-xinit 
     finish_install
 } 
 finish_install(){
@@ -233,7 +233,7 @@ system_config(){
     echo LANG=pt_BR.UTF-8 > /etc/locale.conf
     echo KEYMAP=br-abnt2 > /etc/vconsole.conf
     echo ArchLinuxPC > /etc/hostname
-    echo -e "127.0.0.1	localhost\n::1 	localhost\n127.0.1.1	ArchLinuxPC" > /etc/hosts
+    echo -e "127.0.0.1 localhost.localdomain localhost\n::1 localhost.localdomain localhost\n127.0.1.1 ArchLinuxPC.localdomain ArchLinuxPC" > /etc/hosts
 
     #configurate the current shell to selected language
     export LANG=pt_BR.UTF-8
