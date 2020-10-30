@@ -185,7 +185,14 @@ install_complement(){
     pacman-key --populate archlinux
     
     echo -e "\n\nInstaling essentials packages"
-    (echo ; echo 1; echo Y) | pacman -S grub-efi-x86_64 efibootmgr os-prober pacman-contrib ntfs-3g intel-ucode alsa-utils pulseaudio pulseaudio-alsa pavucontrol xorg-server xorg-xinit xorg-xrandr arandr mesa xf86-video-intel iprout2 networkmanager wireless_tools ntp dhcpcd nano vim
+    (echo ; echo 1; echo Y) | pacman -S grub-efi-x86_64 efibootmgr os-prober pacman-contrib 
+    echo -e "\n\nInstaling audio and filesystem packages"
+    (echo ; echo 1; echo Y) | pacman -S ntfs-3g intel-ucode alsa-utils pulseaudio pulseaudio-alsa pavucontrol 
+    echo -e "\n\nInstaling graph packages"
+    (echo ; echo 1; echo Y) | pacman -S xorg-server xorg-xinit xorg-xrandr arandr mesa xf86-video-intel
+    echo -e "\n\nInstaling network and text packages" 
+    (echo ; echo 1; echo Y) | pacman -S iprout2 networkmanager wireless_tools ntp dhcpcd nano vim
+    # (echo ; echo 1; echo Y) | pacman -S grub-efi-x86_64 efibootmgr os-prober pacman-contrib ntfs-3g intel-ucode alsa-utils pulseaudio pulseaudio-alsa pavucontrol xorg-server xorg-xinit xorg-xrandr arandr mesa xf86-video-intel iprout2 networkmanager wireless_tools ntp dhcpcd nano vim
     
     echo -e "\n\nDo you want to install additional packages?(Y/N)"
     read resp
