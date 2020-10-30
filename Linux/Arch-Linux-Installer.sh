@@ -159,18 +159,18 @@ prepare_partition (){
 install_base(){
 
     
-    # (echo Y) | pacman -Sy pacman-contrib
+     (echo Y) | pacman -Sy pacman-contrib
 
-    # cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bkp
-    # sed -i 's/^#Server/Server/' /etc/pacman.d/mirrorlist.bkp
-    # rankmirrors /etc/pacman.d/mirrorlist.bkp > /etc/pacman.d/mirrorlist
+     cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bkp
+     sed -i 's/^#Server/Server/' /etc/pacman.d/mirrorlist.bkp
+     rankmirrors /etc/pacman.d/mirrorlist.bkp > /etc/pacman.d/mirrorlist
     # rm /etc/pacman.d/mirrorlist.bkp
 
     echo -e "\n\nUpdating system"
-    # (echo Y) | pacman -Syyu
+    (echo Y) | pacman -Syyu
     
     echo -e "\n\nInstalling base packages"
-    pacstrap /mnt base base-devel linux linux-firmware nano dhcpcd
+    pacstrap /mnt base base-devel linux linux-firmware nano dhcpcd git
 
     echo -e "\n\nAdd mounted disks on FSTAB file"
     rm /mnt/etc/fstab
@@ -185,11 +185,15 @@ install_complement(){
     pacman-key --populate archlinux
     
     echo -e "\n\nInstaling essentials packages"
-    (echo ; echo 1; echo Y) | pacman -S grub-efi-x86_64 efibootmgr os-prober pacman-contrib ntfs-3g intel-ucode alsa-utils 
-    pulseaudio pulseaudio-alsa pavucontrol xorg-server xorg-xinit xorg-xrandr arandr mesa xf86-video-intel iprout2 networkmanager 
-    wireless_tools ntp dhcpcd nano vim
-    # Remove the comment to install these packages
-    #(echo ; echo 1; echo Y) | pacman -S feh screenfetch vlc p7zip firefox noto-fonts git xbindkeys htop sddm lm-sensors acpi i3status i3lock i3-wm xfce4-terminal xorg-twm xterm xclock xorg-xinit 
+    (echo ; echo 1; echo Y) | pacman -S grub-efi-x86_64 efibootmgr os-prober pacman-contrib ntfs-3g intel-ucode alsa-utils pulseaudio pulseaudio-alsa pavucontrol xorg-server xorg-xinit xorg-xrandr arandr mesa xf86-video-intel iprout2 networkmanager wireless_tools ntp dhcpcd nano vim
+    
+    echo -e "\n\nDo you want to install additional packages?(Y/N)"
+    read resp
+    if [[ $resp = +(Y|y) ]];
+    then
+        (echo ; echo 1; echo Y) | pacman -S feh screenfetch vlc p7zip firefox noto-fonts git xbindkeys htop sddm lm-sensors acpi i3status i3lock i3-wm xfce4-terminal xorg-twm xterm xclock xorg-xinit 
+    fi
+    
     finish_install
 } 
 finish_install(){
@@ -238,6 +242,7 @@ system_config(){
     #configurate the current shell to selected language
     export LANG=pt_BR.UTF-8
     
+    cp /etc/pacman.conf /etc/pacman.conf.bkp
     echo -e "\n\nEnabling MULTILIB repository"
     sed -i 's/^#[multilib]/[multilib]/g' /etc/pacman.conf > /etc/pacman.conf
     
