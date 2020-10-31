@@ -198,7 +198,10 @@ install_complement(){
     read resp
     if [[ $resp = +(Y|y) ]];
     then
-        (echo ; echo 1; echo Y) | pacman -S feh screenfetch vlc p7zip firefox noto-fonts git xbindkeys htop sddm lm-sensors acpi i3status i3lock i3-wm xfce4-terminal xorg-twm xterm xclock xorg-xinit 
+        (echo ; echo 1; echo Y) | pacman -S feh screenfetch vlc p7zip firefox
+         noto-fonts git xbindkeys htop sddm 
+         lm-sensors acpi i3status i3lock i3-wm xfce4-terminal 
+         xorg-twm xterm xclock xorg-xinit 
     fi
     
     finish_install
@@ -226,8 +229,8 @@ system_config(){
     hwclock --systohc
     timedatectl set-ntp true
     timedatectl status
-    systemclt enable dhcpcd.service
-    systemclt start dhcpcd.service
+    systemctl enable dhcpcd.service
+    systemctl start dhcpcd.service
     systemctl enable NetworkManager.service
     systemctl start NetworkManager.service
     systemctl start sddm.service
@@ -249,9 +252,9 @@ system_config(){
     #configurate the current shell to selected language
     export LANG=pt_BR.UTF-8
     
-    cp /etc/pacman.conf /etc/pacman.conf.bkp
-    echo -e "\n\nEnabling MULTILIB repository"
-    sed -i 's/^#[multilib]/[multilib]/g' /etc/pacman.conf > /etc/pacman.conf
+    # cp /etc/pacman.conf /etc/pacman.conf.bkp
+    # echo -e "\n\nEnabling MULTILIB repository"
+    # sed -i 's/^#[multilib]/[multilib]/g' /etc/pacman.conf > /etc/pacman.conf
     
 }
 create_user(){
