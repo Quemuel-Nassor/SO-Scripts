@@ -1,3 +1,6 @@
+#command to enable powershell script execution
+#Set-ExecutionPolicy -ExecutionPolicy unrestricted
+
 ﻿ECHO "debloating microsoft windows`n"
 
 Get-AppxPackage -allusers *3dviewer* | Remove-AppxPackage
