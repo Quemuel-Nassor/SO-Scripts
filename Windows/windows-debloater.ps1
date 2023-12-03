@@ -39,6 +39,8 @@ Get-AppxPackage -allusers *Wunderlist* | Remove-AppxPackage -allusers
 Get-AppxPackage -allusers *Flipboard* | Remove-AppxPackage -allusers
 Get-AppxPackage -allusers *Twitter* | Remove-AppxPackage -allusers
 Get-AppxPackage -allusers *Facebook* | Remove-AppxPackage -allusers
+Get-AppxPackage -allusers *Whatsapp* | Remove-AppxPackage -allusers
+Get-AppxPackage -allusers *Linkedin* | Remove-AppxPackage -allusers
 Get-AppxPackage -allusers *Microsoft.Advertising* | Remove-AppxPackage -allusers
 Get-AppxPackage -allusers *Microsoft.WhiteBoard* | Remove-AppxPackage -allusers
 Get-AppxPackage -allusers Microsoft.549981C3F5F10 | Remove-AppxPackage -allusers
