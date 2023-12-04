@@ -45,6 +45,7 @@ Get-AppxPackage -allusers *Facebook* | Remove-AppxPackage
 Get-AppxPackage -allusers *Whatsapp* | Remove-AppxPackage
 Get-AppxPackage -allusers *Linkedin* | Remove-AppxPackage
 Get-AppxPackage -allusers *Microsoft.Advertising* | Remove-AppxPackage
+Get-AppxPackage -allusers *Microsoft.Services.Store.Engagement* | Remove-AppxPackage
 Get-AppxPackage -allusers *Microsoft.WhiteBoard* | Remove-AppxPackage
 Get-AppxPackage -allusers Microsoft.549981C3F5F10 | Remove-AppxPackage
 Get-AppxPackage -allusers Microsoft.Windows.CloudExperienceHost | Remove-AppxPackage
@@ -85,10 +86,10 @@ ECHO "disabling unrequired services`n"
 # Set-Service -Name "WSearch" -Status stopped -StartupType disabled 
 
 #superfetch, improves apps performance
-Set-Service -Name "SysMain" -Status stopped -StartupType disabled 
+#Set-Service -Name "SysMain" -Status stopped -StartupType disabled 
 
 #microsoft store user service
-Set-Service -Name "UserDataSvc_2d922" -Status stopped -StartupType disabled 
+Set-Service -Name "UserDataSvc" -Status stopped -StartupType disabled 
 
 #DVR broadcast
 Set-Service -Name "BcastDVRUserService" -Status stopped -StartupType disabled 
