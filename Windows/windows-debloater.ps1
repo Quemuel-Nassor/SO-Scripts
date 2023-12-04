@@ -73,7 +73,7 @@ POWERCFG /H OFF
 
 ECHO "compacting windows installation`n"
 
-Compact.exe /CompactOS:always
+#Compact.exe /CompactOS:always
 
 ECHO "disabling startup apps`n"
 
@@ -96,8 +96,38 @@ Set-Service -Name "BcastDVRUserService" -Status stopped -StartupType disabled
 #sync mail, calendar, etc..
 Set-Service -Name "OneSyncSvc" -Status stopped -StartupType disabled 
 
+Set-Service -Name "OneSyncSvc" -Status stopped -StartupType disabled 
+
 #windows insider service
-Set-Service -Name "wisvc" -Status stopped -StartupType disabled 
+Set-Service -Name "wisvc" -Status stopped -StartupType disabled
+
+#mixed reality services
+Set-Service -Name "MixedRealityOpenXRSvc" -Status stopped -StartupType disabled 
+Set-Service -Name "perceptionsimulation" -Status stopped -StartupType disabled 
+
+#telemetry services
+Set-Service -Name "DiagTrack" -Status stopped -StartupType disabled 
+
+#delivery optmization
+Set-Service -Name "DoSvc" -Status stopped -StartupType disabled 
+
+#maps service
+Set-Service -Name "MapsBroker" -Status stopped -StartupType disabled 
+
+#fax services
+Set-Service -Name "Fax" -Status stopped -StartupType disabled 
+
+#geolocation services
+Set-Service -Name "Ifsvc" -Status stopped -StartupType disabled 
+
+#phone services
+Set-Service -Name "PhoneSvc" -Status stopped -StartupType disabled 
+
+#xbox services
+Set-Service -Name "XboxGipSvc" -Status stopped -StartupType disabled 
+Set-Service -Name "XblAuthManager" -Status stopped -StartupType disabled 
+Set-Service -Name "XblGameSave" -Status stopped -StartupType disabled 
+Set-Service -Name "XboxNetApiSvc" -Status stopped -StartupType disabled 
 
 ECHO "for more visit link bellow"
 ECHO "https://github.com/Sycnex/Windows10Debloater/tree/master`n"
