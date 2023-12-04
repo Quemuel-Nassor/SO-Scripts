@@ -1,7 +1,7 @@
 #command to enable powershell script execution
 #Set-ExecutionPolicy -ExecutionPolicy unrestricted
 
-﻿ECHO "debloating microsoft windows`n"
+ECHO "debloating microsoft windows`n"
 
 Get-AppxPackage -allusers *3dviewer* | Remove-AppxPackage
 Get-AppxPackage -allusers *3dbuilder* | Remove-AppxPackage
@@ -56,11 +56,11 @@ Get-AppxPackage -allusers Microsoft.Windows.GammingApp | Remove-AppxPackage
 
 ECHO "uninstalling packages`n"
 
-Get-WindowsPackage -Online -Packagename *Microsoft-Windows-UserExperience-Desktop-Package* | Remove-WindowsPackage -Online
-Get-WindowsPackage -Online -Packagename *LanguageFeatures-TextToSpeech* | Remove-WindowsPackage -Online
-Get-WindowsPackage -Online -Packagename *LanguageFeatures-Speech* | Remove-WindowsPackage -Online
-Get-WindowsPackage -Online -Packagename *LanguageFeatures-OCR* | Remove-WindowsPackage -Online
-Get-WindowsPackage -Online -Packagename *LanguageFeatures-handwriting* | Remove-WindowsPackage -Online
+Get-WindowsPackage -Online -Packagename *Microsoft-Windows-UserExperience-Desktop-Package* | Remove-WindowsPackage -Online -NoRestart
+Get-WindowsPackage -Online -Packagename *LanguageFeatures-TextToSpeech* | Remove-WindowsPackage -Online -NoRestart
+Get-WindowsPackage -Online -Packagename *LanguageFeatures-Speech* | Remove-WindowsPackage -Online -NoRestart
+Get-WindowsPackage -Online -Packagename *LanguageFeatures-OCR* | Remove-WindowsPackage -Online -NoRestart
+Get-WindowsPackage -Online -Packagename *LanguageFeatures-handwriting* | Remove-WindowsPackage -Online -NoRestart
 
 ECHO "disabling background apps`n"
 
