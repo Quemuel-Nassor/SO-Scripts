@@ -65,7 +65,7 @@ Get-WindowsPackage -Online -Packagename *LanguageFeatures-handwriting* | Remove-
 
 ECHO "disabling background apps`n"
 
-REG ADD HKLM\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications /V GlobalUserDisabled /T REG_DWORD /D 1 /F
+REG ADD HKCU\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications /V GlobalUserDisabled /T REG_DWORD /D 1 /F
 
 ECHO "disabling fast startup and hibernation`n"
 
