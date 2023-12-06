@@ -66,6 +66,7 @@ Get-WindowsPackage -Online -Packagename *LanguageFeatures-OCR* | Remove-WindowsP
 Get-WindowsPackage -Online -Packagename *LanguageFeatures-handwriting* | Remove-WindowsPackage -Online -NoRestart
 Get-WindowsPackage -Online -Packagename *Wordpad* | Remove-WindowsPackage -Online -NoRestart
 Get-WindowsPackage -Online -Packagename *Microsoft-Windows-InternetExplorer* | Remove-WindowsPackage -Online -NoRestart
+Get-AppXProvisionedPackage -Online | Remove-AppxProvisionedPackage -Online
 
 ECHO "disabling background apps`n"
 
