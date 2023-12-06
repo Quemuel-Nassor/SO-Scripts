@@ -62,14 +62,16 @@ Get-WindowsPackage -Online -Packagename *LanguageFeatures-TextToSpeech* | Remove
 Get-WindowsPackage -Online -Packagename *LanguageFeatures-Speech* | Remove-WindowsPackage -Online -NoRestart
 Get-WindowsPackage -Online -Packagename *LanguageFeatures-OCR* | Remove-WindowsPackage -Online -NoRestart
 Get-WindowsPackage -Online -Packagename *LanguageFeatures-handwriting* | Remove-WindowsPackage -Online -NoRestart
+Get-WindowsPackage -Online -Packagename *Wordpad* | Remove-WindowsPackage -Online -NoRestart
+Get-WindowsPackage -Online -Packagename *Microsoft-Windows-InternetExplorer* | Remove-WindowsPackage -Online -NoRestart
 
 ECHO "disabling background apps`n"
 
-REG ADD HKCU\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications /V GlobalUserDisabled /T REG_DWORD /D 1 /F
+#REG ADD HKCU\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications /V GlobalUserDisabled /T REG_DWORD /D 1 /F
 
 ECHO "disabling fast startup and hibernation`n"
 
-REG ADD HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power /V HiberbootEnabled /T REG_DWORD /D 0 /F
+#REG ADD HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power /V HiberbootEnabled /T REG_DWORD /D 0 /F
 POWERCFG /H OFF
 
 ECHO "compacting windows installation`n"
