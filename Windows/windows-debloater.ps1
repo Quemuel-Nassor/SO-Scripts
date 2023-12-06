@@ -44,6 +44,7 @@ Get-AppxPackage -allusers *Twitter* | Remove-AppxPackage
 Get-AppxPackage -allusers *Facebook* | Remove-AppxPackage
 Get-AppxPackage -allusers *Whatsapp* | Remove-AppxPackage
 Get-AppxPackage -allusers *Linkedin* | Remove-AppxPackage
+Get-AppxPackage -allusers *Store* | Remove-AppxPackage
 Get-AppxPackage -allusers *Microsoft.Advertising* | Remove-AppxPackage
 Get-AppxPackage -allusers *Microsoft.Services.Store.Engagement* | Remove-AppxPackage
 Get-AppxPackage -allusers *Microsoft.WhiteBoard* | Remove-AppxPackage
