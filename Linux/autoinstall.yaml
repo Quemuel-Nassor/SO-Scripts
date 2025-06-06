@@ -5,7 +5,7 @@ autoinstall:
     hostname: dev-workstation
     username: nova_singular
     password: '$y$j9T$se5GiRmIwVj9kLwISmUWG/$tx26L2xjDDt0Q8mut0ZG6/w8ZogwlB.u0vYwpkpK7U2'
-  locale: pt_BR.utf8
+  locale: en_US.UTF-8
   keyboard:
     layout: br
     variant: abnt2
