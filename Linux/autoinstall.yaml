@@ -1,6 +1,9 @@
 #cloud-config
 autoinstall:
   version: 1
+  interactive-sections:
+    - keyboard
+    - storage
   identity:
     realname: 'Nova Singular'
     hostname: dev-workstation
@@ -10,10 +13,7 @@ autoinstall:
   keyboard:
     layout: br
     variant: abnt2
-    interactive: true
   timezone: America/Sao_Paulo
-  storage:
-    interactive: true 
   codecs:
     install: true
   drivers:
