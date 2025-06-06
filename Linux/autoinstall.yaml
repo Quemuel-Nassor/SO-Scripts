@@ -47,7 +47,7 @@ autoinstall:
 
     # Add Firefox PPA and prioritize it
     - curtin in-target --target=/target -- add-apt-repository -y ppa:mozillateam/ppa
-    - curtin in-target --target=/target -- bash -c "echo -e 'Package: *\nPin: release o=LP-PPA-mozillateam\nPin-Priority: 1001' > /etc/apt/preferences.d/mozilla-firefox"
+    - curtin in-target --target=/target -- bash -c 'echo -e "Acquire::Queue-Mode \"access\";\nAcquire::Retries \"3\";\nAcquire::http::Dl-Limit \"0\";\nAcquire::http::Pipeline-Depth \"5\";" > /etc/apt/apt.conf.d/99parallel'
 
     # Add Microsoft repository (VSCode, Edge, .NET SDKs)
     - curtin in-target --target=/target -- bash -c "wget -q https://packages.microsoft.com/config/ubuntu/22.04/prod.list -O /etc/apt/sources.list.d/microsoft-prod.list"
