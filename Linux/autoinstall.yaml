@@ -18,7 +18,7 @@ autoinstall:
       install: true
     drivers:
       install: true
-    updates: none
+    updates: security
     shutdown: reboot
   
     late-commands:
