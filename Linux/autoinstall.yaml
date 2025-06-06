@@ -1,64 +1,64 @@
 #cloud-config
 autoinstall:
-  version: 1
-  interactive-sections:
-    - keyboard
-    - storage
-  identity:
-    realname: 'Nova Singular'
-    hostname: dev-workstation
-    username: nova_singular
-    password: '$y$j9T$se5GiRmIwVj9kLwISmUWG/$tx26L2xjDDt0Q8mut0ZG6/w8ZogwlB.u0vYwpkpK7U2'
-  locale: en_US.UTF-8
-  keyboard:
-    layout: br
-    variant: abnt2
-  timezone: America/Sao_Paulo
-  storage: {}
-  codecs:
-    install: true
-  drivers:
-    install: true
-  updates: none
-  shutdown: reboot
+    version: 1
+    interactive-sections:
+      - keyboard
+      - storage
+    identity:
+      realname: 'Nova Singular'
+      hostname: dev-workstation
+      username: nova_singular
+      password: '$y$j9T$se5GiRmIwVj9kLwISmUWG/$tx26L2xjDDt0Q8mut0ZG6/w8ZogwlB.u0vYwpkpK7U2'
+    locale: en_US.UTF-8
+    keyboard:
+      layout: br
+      variant: abnt2
+    timezone: America/Sao_Paulo
+    storage: {}
+    codecs:
+      install: true
+    drivers:
+      install: true
+    updates: none
+    shutdown: reboot
   
-  late-commands:
-    # Set dark theme for user
-    - curtin in-target --target=/target -- bash -c "sudo -u nova_singular dbus-launch gsettings set org.gnome.desktop.interface gtk-theme 'Yaru-dark'"
+    late-commands:
+      # Set dark theme for user
+      - curtin in-target --target=/target -- bash -c "sudo -u nova_singular dbus-launch gsettings set org.gnome.desktop.interface gtk-theme 'Yaru-dark'"
     
-    # Set dock position to bottom
-    - curtin in-target --target=/target -- bash -c "sudo -u nova_singular dbus-launch gsettings set org.gnome.shell.extensions.dash-to-dock dock-position 'BOTTOM'"
+      # Set dock position to bottom
+      - curtin in-target --target=/target -- bash -c "sudo -u nova_singular dbus-launch gsettings set org.gnome.shell.extensions.dash-to-dock dock-position 'BOTTOM'"
     
-    # Stop and disable snapd
-    - curtin in-target --target=/target -- systemctl stop snapd || true
-    - curtin in-target --target=/target -- systemctl disable snapd || true
+      # Stop and disable snapd
+      - curtin in-target --target=/target -- systemctl stop snapd || true
+      - curtin in-target --target=/target -- systemctl disable snapd || true
     
-    # Remove all snap packages
-    - curtin in-target --target=/target -- bash -c "if command -v snap >/dev/null; then for pkg in \$(snap list | awk 'NR>1 {print \$1}'); do snap remove \"\$pkg\" || true; done; fi"
+      # Remove all snap packages
+      - curtin in-target --target=/target -- bash -c "if command -v snap >/dev/null; then for pkg in \$(snap list | awk 'NR>1 {print \$1}'); do snap remove \"\$pkg\" || true; done; fi"
     
-    # Remove snapd and unused packages
-    - curtin in-target --target=/target -- apt purge -y snapd yelp evince gnome-nettool gnome-power-statistics gnome-system-monitor
-    - curtin in-target --target=/target -- apt autoremove --purge -y
+      # Remove snapd and unused packages
+      - curtin in-target --target=/target -- apt purge -y snapd yelp evince gnome-nettool gnome-power-statistics gnome-system-monitor
+      - curtin in-target --target=/target -- apt autoremove --purge -y
     
-    # Remove snap-related folders
-    - curtin in-target --target=/target -- bash -c "rm -rf /root/snap /snap /var/snap /var/lib/snapd"
+      # Remove snap-related folders
+      - curtin in-target --target=/target -- bash -c "rm -rf /root/snap /snap /var/snap /var/lib/snapd"
     
-    # Prevent snapd from being reinstalled
-    - curtin in-target --target=/target -- apt-mark hold snapd
+      # Prevent snapd from being reinstalled
+      - curtin in-target --target=/target -- apt-mark hold snapd
     
-    # Add Firefox PPA and prioritize it
-    - curtin in-target --target=/target -- add-apt-repository -y ppa:mozillateam/ppa
-    - curtin in-target --target=/target -- bash -c 'echo -e "Acquire::Queue-Mode \"access\";\nAcquire::Retries \"3\";\nAcquire::http::Dl-Limit \"0\";\nAcquire::http::Pipeline-Depth \"5\";" > /etc/apt/apt.conf.d/99parallel'
+      # Add Firefox PPA and prioritize it
+      - curtin in-target --target=/target -- add-apt-repository -y ppa:mozillateam/ppa
+      - curtin in-target --target=/target -- bash -c 'echo -e "Acquire::Queue-Mode \"access\";\nAcquire::Retries \"3\";\nAcquire::http::Dl-Limit \"0\";\nAcquire::http::Pipeline-Depth \"5\";" > /etc/apt/apt.conf.d/99parallel'
     
-    # Add Microsoft repository (VSCode, Edge, .NET SDKs)
-    - curtin in-target --target=/target -- bash -c "wget -q https://packages.microsoft.com/config/ubuntu/22.04/prod.list -O /etc/apt/sources.list.d/microsoft-prod.list"
+      # Add Microsoft repository (VSCode, Edge, .NET SDKs)
+      - curtin in-target --target=/target -- bash -c "wget -q https://packages.microsoft.com/config/ubuntu/22.04/prod.list -O /etc/apt/sources.list.d/microsoft-prod.list"
     
-    # Add DBeaver repository and GPG key
-    - curtin in-target --target=/target -- bash -c "wget -qO /usr/share/keyrings/dbeaver.gpg https://dbeaver.io/debs/dbeaver.gpg.key"
-    - curtin in-target --target=/target -- bash -c 'echo "deb [signed-by=/usr/share/keyrings/dbeaver.gpg] https://dbeaver.io/debs/dbeaver-ce/ /" > /etc/apt/sources.list.d/dbeaver.list'
+      # Add DBeaver repository and GPG key
+      - curtin in-target --target=/target -- bash -c "wget -qO /usr/share/keyrings/dbeaver.gpg https://dbeaver.io/debs/dbeaver.gpg.key"
+      - curtin in-target --target=/target -- bash -c 'echo "deb [signed-by=/usr/share/keyrings/dbeaver.gpg] https://dbeaver.io/debs/dbeaver-ce/ /" > /etc/apt/sources.list.d/dbeaver.list'
     
-    # Improve APT download performance
-    - curtin in-target --target=/target -- bash -c "echo -e 'Acquire::Queue-Mode \"access\";\nAcquire::Retries \"3\";\nAcquire::http::Dl-Limit \"0\";\nAcquire::http::Pipeline-Depth \"5\";' > /etc/apt/apt.conf.d/99parallel"
+      # Improve APT download performance
+      - curtin in-target --target=/target -- bash -c "echo -e 'Acquire::Queue-Mode \"access\";\nAcquire::Retries \"3\";\nAcquire::http::Dl-Limit \"0\";\nAcquire::http::Pipeline-Depth \"5\";' > /etc/apt/apt.conf.d/99parallel"
     
-    # Update APT and install apps
-    - curtin in-target --target=/target -- bash -c "apt update && apt install -y synaptic firefox gimp libreoffice-writer libreoffice-calc git nodejs microsoft-edge-stable dbeaver-ce code dotnet-sdk-8.0 dotnet-sdk-9.0"
+      # Update APT and install apps
+      - curtin in-target --target=/target -- bash -c "apt update && apt install -y synaptic firefox gimp libreoffice-writer libreoffice-calc git nodejs microsoft-edge-stable dbeaver-ce code dotnet-sdk-8.0 dotnet-sdk-9.0"
