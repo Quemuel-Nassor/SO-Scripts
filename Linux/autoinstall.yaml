@@ -12,7 +12,6 @@ autoinstall:
     locale: en_US.UTF-8
     keyboard:
       layout: br
-      variant: abnt2
     timezone: America/Sao_Paulo
     storage: {}
     codecs:
