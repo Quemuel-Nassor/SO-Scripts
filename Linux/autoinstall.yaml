@@ -25,10 +25,10 @@ autoinstall:
     late-commands:
       # Download post install script, set ownership and permissions
       - curtin in-target --target=/target -- /bin/bash -c "wget -O /home/nova_singular/Desktop/post-install-setup.sh https://raw.githubusercontent.com/Quemuel-Nassor/SO-Scripts/refs/heads/master/Linux/post-install-setup.sh && chown nova_singular:nova_singular /home/nova_singular/Desktop/post-install-setup.sh && chmod +x /home/nova_singular/Desktop/post-install-setup.sh"
-      
+
       # Create autostart directory
       - curtin in-target --target=/target -- /bin/bash -c "mkdir -p /home/nova_singular/.config/autostart"
-      
+
       # Create autostart desktop entry for first login execution
       - curtin in-target --target=/target -- /bin/bash -c "cat > /home/nova_singular/.config/autostart/post-install-setup.desktop <<EOF
 [Desktop Entry]
