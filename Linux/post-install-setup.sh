@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Set dark theme for user
-sudo -u "$LOGNAME" dbus-launch gsettings set org.gnome.desktop.interface gtk-theme 'Yaru-dark'
+gsettings set org.gnome.desktop.interface gtk-theme 'Yaru-dark'
 
 # Set dock position to bottom
-sudo -u "$LOGNAME" dbus-launch gsettings set org.gnome.shell.extensions.dash-to-dock dock-position 'BOTTOM'
+gsettings set org.gnome.shell.extensions.dash-to-dock dock-position 'BOTTOM'
 
 # Stop and disable snapd
 systemctl stop snapd
