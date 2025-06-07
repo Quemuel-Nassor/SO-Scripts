@@ -21,6 +21,9 @@ rm -rf /root/snap /snap /var/snap /var/lib/snapd /home/*/snap
 # Prevent snapd from being reinstalled
 apt-mark hold snapd
 
+# Install required dependency for add-apt-repository command
+apt install software-properties-common
+
 # Add Firefox repository
 add-apt-repository -y ppa:mozillateam/ppa
 
@@ -45,6 +48,9 @@ sudo mv prod.list /etc/apt/sources.list.d/microsoft-prod.list
 
 # Move the key to the appropriate place
 sudo mv microsoft.asc.gpg $(cat /etc/apt/sources.list.d/microsoft-prod.list | grep -oP "(?<=signed-by=).*(?=\])")
+
+# Add Microsoft backport repository
+sudo add-apt-repository ppa:dotnet/backports
 
 # Improve APT download performance
 cat <<EOF | sudo tee /etc/apt/apt.conf.d/99parallel > /dev/null
