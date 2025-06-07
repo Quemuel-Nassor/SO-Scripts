@@ -12,7 +12,7 @@ autoinstall:
     locale: en_US.UTF-8
     keyboard:
       layout: br
-      variant: abnt2-nodeadkeys
+      variant: nodeadkeys
     timezone: America/Sao_Paulo
     storage: {}
     codecs:
