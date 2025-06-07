@@ -2,7 +2,9 @@
 
 # Stop and disable snapd
 systemctl stop snapd
+systemctl stop snapd.socket
 systemctl disable snapd
+systemctl disable snapd.socket
 
 # Remove all snap packages
 for pkg in $(snap list | awk 'NR > 1 {print $1}'); do
