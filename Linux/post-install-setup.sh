@@ -40,7 +40,7 @@ EOL
 #mv /tmp/microsoft-prod.list /etc/apt/sources.list.d/microsoft-prod.list
 
 # Add Microsoft GPG key
-curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | sudo tee /usr/share/keyrings/microsoft.gpg > /dev/null
+wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | sudo tee /usr/share/keyrings/microsoft.gpg > /dev/null
 
 # Add Microsoft .NET SDK repository
 cat <<EOF | sudo tee /etc/apt/sources.list.d/microsoft-prod.list > /dev/null
