@@ -13,7 +13,6 @@ done
 
 # Remove unused packages
 apt purge -y snapd yelp evince gnome-nettool gnome-power-statistics gnome-system-monitor software-properties-gtk update-manager
-apt autoremove --purge -y
 
 # Remove snap-related folders
 rm -rf /root/snap /snap /var/snap /var/lib/snapd /home/*/snap
@@ -21,36 +20,43 @@ rm -rf /root/snap /snap /var/snap /var/lib/snapd /home/*/snap
 # Prevent snapd from being reinstalled
 apt-mark hold snapd
 
-# Install required dependency for add-apt-repository command
-apt install software-properties-common
+# Install required dependencies
+apt update
+apt install --no-install-recommends -y software-properties-common gpg wget
+
+########### Configure Private repositories ###########
 
 # Add Firefox repository
 add-apt-repository -y ppa:mozillateam/ppa
 
-# Configure APT to prefer packages from the Mozilla Team PPA instead of using Snap packages
-cat <<EOL | sudo tee /etc/apt/preferences.d/mozilla-firefox > /dev/null
-Package: *
-Pin: release o=LP-PPA-mozillateam
-Pin-Priority: 1001
-EOL
+# Add Microsoft .NET backports for Ubuntu 22.04 (.NET 9)
+add-apt-repository -y ppa:dotnet/backports
+
+########### Configure Microsoft respositories ###########
 
 # Get OS version info which adds the $ID and $VERSION_ID variables
 source /etc/os-release
 
-# Download the Microsoft keys
-sudo apt-get install -y gpg wget
-wget https://packages.microsoft.com/keys/microsoft.asc
-cat microsoft.asc | gpg --dearmor -o microsoft.asc.gpg
+# Download Microsoft signing key and repository
+wget https://packages.microsoft.com/config/$ID/$VERSION_ID/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
 
-# Add the Microsoft repository to the system's sources list
-wget https://packages.microsoft.com/config/$ID/$VERSION_ID/prod.list
-sudo mv prod.list /etc/apt/sources.list.d/microsoft-prod.list
+# Install Microsoft signing key and repository
+dpkg -i packages-microsoft-prod.deb
 
-# Move the key to the appropriate place
-sudo mv microsoft.asc.gpg $(cat /etc/apt/sources.list.d/microsoft-prod.list | grep -oP "(?<=signed-by=).*(?=\])")
+# Clean up
+rm packages-microsoft-prod.deb
 
-# Add Microsoft backport repository
-sudo add-apt-repository ppa:dotnet/backports
+# Add VsCode repository
+cat <<EOF | sudo tee /etc/apt/sources.list.d/vscode.list > /dev/null
+deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/code stable main
+EOF
+
+# Add Edge repository
+cat <<EOF | sudo tee /etc/apt/sources.list.d/microsoft-edge.list > /dev/null
+deb [arch=amd64 signed-by=/etc/apt/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/edge stable main
+EOF
+
+########### Configure APT preferences ###########
 
 # Improve APT download performance
 cat <<EOF | sudo tee /etc/apt/apt.conf.d/99parallel > /dev/null
@@ -60,6 +66,15 @@ Acquire::http::Dl-Limit "0";
 Acquire::http::Pipeline-Depth "5";
 EOF
 
+# Configure APT to prefer packages from the Mozilla Team PPA instead of using Snap packages
+cat <<EOL | sudo tee /etc/apt/preferences.d/mozilla-firefox > /dev/null
+Package: *
+Pin: release o=LP-PPA-mozillateam
+Pin-Priority: 1001
+EOL
+
+########### Install packages ###########
+
 # Update APT and install apps
 apt update
 apt install --no-install-recommends -y flatpak gnome-software gnome-software-plugin-flatpak libreoffice-writer libreoffice-calc gimp gimp-data-extras ghostscript libwmf-bin git nodejs dotnet-sdk-8.0 dotnet-sdk-9.0
@@ -68,3 +83,8 @@ apt install -y firefox timeshift microsoft-edge-stable code
 # Configure flatpak and install additional apps
 flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 flatpak install -y flathub io.dbeaver.DBeaverCommunity com.microsoft.AzureStorageExplorer
+
+########### Package cleanup ###########
+
+apt autoremove --purge -y
+apt clean
