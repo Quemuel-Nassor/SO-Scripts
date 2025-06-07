@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# Set dark theme for user
-gsettings set org.gnome.desktop.interface gtk-theme 'Yaru-dark'
-
-# Set dock position to bottom
-gsettings set org.gnome.shell.extensions.dash-to-dock dock-position 'BOTTOM'
-
 # Stop and disable snapd
 systemctl stop snapd
 systemctl disable snapd
