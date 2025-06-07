@@ -48,12 +48,12 @@ rm packages-microsoft-prod.deb
 
 # Add VsCode repository
 cat <<EOF | sudo tee /etc/apt/sources.list.d/vscode.list > /dev/null
-deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/code stable main
+deb [arch=amd64,arm64,armhf signed-by=/etc/apt/trusted.gpg.d/microsoft-prod.gpg] https://packages.microsoft.com/repos/code stable main
 EOF
 
 # Add Edge repository
 cat <<EOF | sudo tee /etc/apt/sources.list.d/microsoft-edge.list > /dev/null
-deb [arch=amd64 signed-by=/etc/apt/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/edge stable main
+deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/microsoft-prod.gpg] https://packages.microsoft.com/repos/edge stable main
 EOF
 
 ########### Configure APT preferences ###########
