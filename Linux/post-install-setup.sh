@@ -31,31 +31,20 @@ Pin: release o=LP-PPA-mozillateam
 Pin-Priority: 1001
 EOL
 
-## Add Microsoft repository
-#wget https://packages.microsoft.com/keys/microsoft.asc -O microsoft.asc
-#gpg --dearmor microsoft.asc
-#sudo mv microsoft.asc.gpg /usr/share/keyrings/microsoft.gpg
-#rm microsoft.asc
-#wget -q https://packages.microsoft.com/config/ubuntu/22.04/prod.list -O /tmp/microsoft-prod.list
-#mv /tmp/microsoft-prod.list /etc/apt/sources.list.d/microsoft-prod.list
+# Get OS version info which adds the $ID and $VERSION_ID variables
+source /etc/os-release
 
-# Add Microsoft GPG key
-wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | sudo tee /usr/share/keyrings/microsoft.gpg > /dev/null
+# Download the Microsoft keys
+sudo apt-get install -y gpg wget
+wget https://packages.microsoft.com/keys/microsoft.asc
+cat microsoft.asc | gpg --dearmor -o microsoft.asc.gpg
 
-# Add Microsoft .NET SDK repository
-cat <<EOF | sudo tee /etc/apt/sources.list.d/microsoft-prod.list > /dev/null
-deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/ubuntu/22.04/prod jammy main
-EOF
+# Add the Microsoft repository to the system's sources list
+wget https://packages.microsoft.com/config/$ID/$VERSION_ID/prod.list
+sudo mv prod.list /etc/apt/sources.list.d/microsoft-prod.list
 
-# Add Visual Studio Code repository
-cat <<EOF | sudo tee /etc/apt/sources.list.d/vscode.list > /dev/null
-deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/vscode stable main
-EOF
-
-# Add Microsoft Edge repository
-cat <<EOF | sudo tee /etc/apt/sources.list.d/microsoft-edge.list > /dev/null
-deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/edge stable main
-EOF
+# Move the key to the appropriate place
+sudo mv microsoft.asc.gpg $(cat /etc/apt/sources.list.d/microsoft-prod.list | grep -oP "(?<=signed-by=).*(?=\])")
 
 # Improve APT download performance
 cat <<EOF | sudo tee /etc/apt/apt.conf.d/99parallel > /dev/null
