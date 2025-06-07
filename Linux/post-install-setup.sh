@@ -44,7 +44,7 @@ EOF
 # Update APT and install apps
 apt update
 apt install --no-install-recommends -y flatpak gnome-software gnome-software-plugin-flatpak libreoffice-writer libreoffice-calc gimp gimp-data-extras ghostscript libwmf-bin git nodejs dotnet-sdk-8.0 dotnet-sdk-9.0
-apt install -y firefox microsoft-edge-stable code
+apt install -y firefox timeshift microsoft-edge-stable code
 
 # Configure flatpak and install additional apps
 flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
