@@ -32,7 +32,10 @@ Pin-Priority: 1001
 EOL
 
 # Add Microsoft repository
-wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | sudo tee /usr/share/keyrings/microsoft.gpg > /dev/null
+wget https://packages.microsoft.com/keys/microsoft.asc -O microsoft.asc
+gpg --dearmor microsoft.asc
+sudo mv microsoft.asc.gpg /usr/share/keyrings/microsoft.gpg
+rm microsoft.asc
 wget -q https://packages.microsoft.com/config/ubuntu/22.04/prod.list -O /tmp/microsoft-prod.list
 mv /tmp/microsoft-prod.list /etc/apt/sources.list.d/microsoft-prod.list
 
