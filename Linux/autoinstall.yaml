@@ -21,6 +21,7 @@ autoinstall:
       install: true
     updates: security
     shutdown: reboot
+    
     late-commands:
       # Download post install script, set ownership and permissions
       - curtin in-target --target=/target -- /bin/bash -c "wget -O /home/nova_singular/Desktop/post-install-setup.sh https://raw.githubusercontent.com/Quemuel-Nassor/SO-Scripts/refs/heads/master/Linux/post-install-setup.sh && chown nova_singular:nova_singular /home/nova_singular/Desktop/post-install-setup.sh && chmod +x /home/nova_singular/Desktop/post-install-setup.sh"
