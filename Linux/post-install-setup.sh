@@ -92,3 +92,11 @@ flatpak install -y flathub io.dbeaver.DBeaverCommunity com.microsoft.AzureStorag
 
 apt autoremove --purge -y
 apt clean
+
+########### Disable MSBUILD node reuse ###########
+
+cat <<EOL >> ~/.bashrc
+export MSBUILDDISABLENODEREUSE=1
+EOL
+
+source ~/.bashrc
