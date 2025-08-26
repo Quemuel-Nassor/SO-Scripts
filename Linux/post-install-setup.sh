@@ -6,6 +6,12 @@ systemctl stop snapd.socket
 systemctl disable snapd
 systemctl disable snapd.socket
 
+# Disable network waiter
+systemctl disable NetworkManager-wait-online.service
+
+# Disable boot animation
+systemctl mask plymouth-quit-wait.service
+
 # Remove all snap packages
 for pkg in $(snap list | awk 'NR > 1 {print $1}'); do
     snap remove "$pkg"
